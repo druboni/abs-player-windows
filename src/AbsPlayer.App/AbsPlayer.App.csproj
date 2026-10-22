@@ -17,7 +17,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Version>0.1.0</Version>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Product>ABS Player</Product>
+    <Company>druboni</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AbsPlayer.Core\AbsPlayer.Core.csproj" />

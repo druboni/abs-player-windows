@@ -25,6 +25,14 @@ dotnet build src/AbsPlayer.App -p:Platform=x64
 src\AbsPlayer.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ABSPlayer.exe
 ```
 
+## Installer
+```
+pwsh installer\build.ps1
+```
+Runs the tests, publishes a self-contained Release build (it bundles .NET and the Windows App SDK, so nothing else needs installing) and compiles `installer\ABSPlayer.iss` with [Inno Setup 6](https://jrsoftware.org/isinfo.php). Output: `installer\Output\ABSPlayer-<version>-Setup.exe` (about 60 MB). The version comes from `<Version>` in `src\AbsPlayer.App\AbsPlayer.App.csproj`.
+
+The installer installs for the current user by default, with no admin prompt. It offers an "all users" install on its first page. Uninstalling keeps settings, saved positions and the sign-in token, so a reinstall picks up where you left off. `installer\make-icon.py` redraws the app icon.
+
 Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager), never in the settings file.
 
 ## Tests
@@ -46,4 +54,4 @@ dotnet test --filter LiveServerTests
 - [x] Step 2: playback and sync (Windows media player, media keys and overlay)
 - [ ] Step 3: screens (sign-in, library, book detail, player, settings) — built, not yet tried on screen
 - [ ] Step 4: downloads and offline playback
-- [ ] Step 5: installer
+- [x] Step 5: installer (Inno Setup, per-user)

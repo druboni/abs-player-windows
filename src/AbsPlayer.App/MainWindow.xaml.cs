@@ -20,6 +20,7 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         var scale = GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
         AppWindow.Resize(new SizeInt32((int)(1100 * scale), (int)(780 * scale)));
+        AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         AppWindow.Closing += OnClosing;
         VisibilityChanged += OnVisibilityChanged;
         Services.Repository.Api.SessionExpired += (_, _) => Services.Dispatcher.TryEnqueue(() =>
