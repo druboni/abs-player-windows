@@ -1,0 +1,38 @@
+# ABS Player for Windows
+
+A native Windows (WinUI 3, .NET 10) audiobook player for [Audiobookshelf](https://www.audiobookshelf.org). It's a port of [abs-player-apple](https://github.com/druboni/abs-player-apple), and it syncs position the same way that app does.
+
+> ABS Player is an independent app and is not affiliated with the Audiobookshelf project.
+
+## Layout
+```
+src/AbsPlayer.Core/          No UI. Ported from abs-player-apple/Shared.
+  Api/                       Audiobookshelf HTTP client: token refresh, server discovery, errors
+  Models/                    API models and tolerant JSON converters
+  Storage/                   Settings file, Credential Locker tokens, user preferences
+  AudiobookRepository.cs     What the UI calls
+  LocalProgressStore.cs      Position saved on this device; sent to the server once back online
+tests/AbsPlayer.Core.Tests/  xUnit tests
+```
+
+Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager), never in the settings file.
+
+## Tests
+```
+dotnet test
+```
+Most tests run against a fake HTTP handler and need no server.
+
+`LiveServerTests` are read-only checks against a real server. They don't start sessions, change progress or touch bookmarks. They're skipped unless both of these are set:
+```powershell
+$env:ABS_LIVE_URL = "https://abs.example.com"
+$env:ABS_LIVE_TOKEN = "<an Audiobookshelf API key or user token>"
+dotnet test --filter LiveServerTests
+```
+
+## Status
+- [x] Step 1: API client, models, repository, token storage, offline progress
+- [ ] Step 2: playback and sync (Windows media player, media keys and overlay)
+- [ ] Step 3: screens (sign-in, library, book detail, player, settings)
+- [ ] Step 4: downloads and offline playback
+- [ ] Step 5: installer
