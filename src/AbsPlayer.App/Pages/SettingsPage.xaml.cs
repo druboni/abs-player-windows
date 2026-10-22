@@ -34,6 +34,8 @@ public sealed partial class SettingsPage : Page
         Fill(Sort, Enum.GetValues<LibrarySort>().Select(s => new Option<LibrarySort>(s.Label(), s)), Prefs.LibrarySort);
         HideFinished.IsOn = Prefs.HideFinished;
         AutoUpdate.IsOn = Services.Updates.Enabled;
+        RequesterUrl.Text = Services.Requester.Url ?? "";
+        RenderRequester();
         _loading = false;
 
         if (Services.User.ServerUrl is { } server)
@@ -54,6 +56,66 @@ public sealed partial class SettingsPage : Page
     private void OnRewindChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Prefs.RewindOnResume = Picked<int>(Rewind); }
     private void OnSpeedChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Services.Audio.SetSpeed(Picked<double>(Speed)); }
     private void OnHideFinishedToggled(object sender, RoutedEventArgs e) { if (!_loading) Prefs.HideFinished = HideFinished.IsOn; }
+
+    // Audiobook Requester
+
+    private void RenderRequester(string? error = null)
+    {
+        var r = Services.Requester;
+        RequesterConnect.Content = r.IsConnected ? "Reconnect…" : "Connect…";
+        RequesterDisconnect.Visibility = Ui.Show(r.Url is not null);
+        RequesterStatus.Text = error ?? (r.IsConnected
+            ? $"Connected as {r.Username}{(r.IsAdmin ? " (admin)" : "")}. Use Request in the top bar."
+            : r.Url is not null ? "Signed out. Click Connect to sign in again." : "Not connected.");
+        RequesterStatus.Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources[
+            error is not null ? "SystemFillColorCriticalBrush" : r.IsConnected ? "SystemFillColorSuccessBrush" : "TextFillColorSecondaryBrush"];
+    }
+
+    /// <summary>Asks for the Audiobookshelf password (the username is the one signed in here), then connects.</summary>
+    private async void OnRequesterConnect(object sender, RoutedEventArgs e)
+    {
+        if (RequesterUrl.Text.Trim().Length == 0)
+        {
+            RenderRequester("Enter the Requester address first.");
+            RequesterUrl.Focus(FocusState.Programmatic);
+            return;
+        }
+        var username = new TextBox { Header = "Audiobookshelf username", Text = Services.Requester.Username ?? Services.User.Username ?? "" };
+        var password = new PasswordBox { Header = "Audiobookshelf password" };
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = "Sign in to Audiobook Requester",
+            Content = new StackPanel { Spacing = 12, Children = { username, password } },
+            PrimaryButtonText = "Connect",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+        };
+        dialog.Opened += (_, _) => password.Focus(FocusState.Programmatic);
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        RequesterConnect.IsEnabled = false;
+        RequesterBusy.IsActive = true;
+        try
+        {
+            await Services.Requester.Connect(RequesterUrl.Text, username.Text.Trim(), password.Password);
+            RequesterUrl.Text = Services.Requester.Url ?? RequesterUrl.Text;
+            RenderRequester();
+        }
+        catch (Core.Requester.RequesterException ex) { RenderRequester(ex.Message); }
+        finally
+        {
+            RequesterConnect.IsEnabled = true;
+            RequesterBusy.IsActive = false;
+        }
+    }
+
+    private void OnRequesterDisconnect(object sender, RoutedEventArgs e)
+    {
+        Services.Requester.Disconnect(forgetUrl: true);
+        RequesterUrl.Text = "";
+        RenderRequester();
+    }
 
     private void OnAutoUpdateToggled(object sender, RoutedEventArgs e) { if (!_loading) Services.Updates.Enabled = AutoUpdate.IsOn; }
 

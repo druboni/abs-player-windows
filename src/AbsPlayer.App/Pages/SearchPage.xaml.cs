@@ -34,7 +34,14 @@ public sealed partial class SearchPage : Page
         Authors.ItemsSource = r?.Authors.Select(a => new AuthorVm(a)).ToList();
         Series.ItemsSource = r?.Series.Select(s => new SeriesVm(s)).ToList();
         Books.ItemsSource = r is null ? null : BookVm.From(r.Books);
+        var query = App.Window.SearchText.Trim();
+        RequestLink.Visibility = Ui.Show(r is not null && Services.Requester.Url is not null && query.Length >= 2);
+        RequestLinkText.Text = r is { IsEmpty: true }
+            ? $"Not in your library. Request “{query}”"
+            : $"Not what you're looking for? Request “{query}”";
     }
+
+    private void OnRequestLink(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => App.Window.OpenRequests(App.Window.SearchText);
 
     private void OnAuthorClick(object sender, ItemClickEventArgs e) => App.Window.Open(((AuthorVm)e.ClickedItem).Author);
     private void OnSeriesClick(object sender, ItemClickEventArgs e) => App.Window.Open(((SeriesVm)e.ClickedItem).Series);

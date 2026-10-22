@@ -13,6 +13,30 @@ public sealed class LiveFactAttribute : FactAttribute
     }
 }
 
+/// <summary>Runs only when REQUESTER_LIVE_URL is set (an Audiobook Requester address, e.g. host:5066).</summary>
+public sealed class RequesterLiveFactAttribute : FactAttribute
+{
+    public RequesterLiveFactAttribute()
+    {
+        if (Environment.GetEnvironmentVariable("REQUESTER_LIVE_URL") is null)
+            Skip = "Set REQUESTER_LIVE_URL to check against a real Audiobook Requester.";
+    }
+}
+
+public class RequesterLiveTests
+{
+    /// <summary>Only the public ping: no sign-in, nothing changes.</summary>
+    [RequesterLiveFact]
+    public async Task Finds_requester_from_a_bare_address()
+    {
+        using var http = new HttpClient();
+        var input = Environment.GetEnvironmentVariable("REQUESTER_LIVE_URL")!;
+        var resolved = await Requester.RequesterClient.Resolve(input.Replace("http://", "").Replace("https://", ""), http);
+        Assert.StartsWith("http", resolved);
+        Assert.False(resolved.EndsWith('/'));
+    }
+}
+
 /// <summary>
 /// Read-only checks against a real Audiobookshelf server: nothing here starts a session,
 /// changes progress or touches bookmarks.

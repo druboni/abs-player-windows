@@ -36,6 +36,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button x:Name="BackButton" Click="OnBackClick" IsEnabled="False" ToolTipService.ToolTip="Back (Alt+Left)"
                     Background="Transparent" BorderThickness="0" Padding="8">
@@ -47,10 +48,16 @@
             </StackPanel>
             <AutoSuggestBox x:Name="SearchBox" Grid.Column="3" Width="320" PlaceholderText="Titles, authors, series"
                             QueryIcon="Find" TextChanged="OnSearchTextChanged" VerticalAlignment="Center" />
-            <ComboBox x:Name="LibraryPicker" Grid.Column="4" MinWidth="160" VerticalAlignment="Center"
+            <Button x:Name="RequestButton" Grid.Column="4" Click="OnRequestsClick" ToolTipService.ToolTip="Request a book (Audiobook Requester)" Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                    <TextBlock Text="Request" />
+                </StackPanel>
+            </Button>
+            <ComboBox x:Name="LibraryPicker" Grid.Column="5" MinWidth="160" VerticalAlignment="Center"
                       DisplayMemberPath="Name" SelectionChanged="OnLibraryPicked" Visibility="Collapsed"
                       ToolTipService.ToolTip="Library" />
-            <Button Grid.Column="5" Click="OnSettingsClick" ToolTipService.ToolTip="Settings"
+            <Button Grid.Column="6" Click="OnSettingsClick" ToolTipService.ToolTip="Settings"
                     Background="Transparent" BorderThickness="0" Padding="8">
                 <FontIcon Glyph="&#xE713;" FontSize="16" />
             </Button>

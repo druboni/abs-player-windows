@@ -29,6 +29,10 @@ public sealed partial class MainWindow : Window
             if (Services.User.IsLoggedIn) SignOut(forgetServer: false);
         });
 
+        Services.Requester.Changed += (_, _) => Services.Dispatcher.TryEnqueue(UpdateRequestButton);
+        Services.Requester.SignedOut += (_, _) => Services.Dispatcher.TryEnqueue(UpdateRequestButton);
+        UpdateRequestButton();
+
         if (Services.User.IsLoggedIn) ShowLibrary();
         else ShowLogin();
         _ = CheckForUpdatesSoon();
@@ -157,6 +161,20 @@ public sealed partial class MainWindow : Window
     private void GoBack()
     {
         if (ContentFrame.CanGoBack) ContentFrame.GoBack();
+    }
+
+    /// <summary>Request shows once a Requester address is set up (even signed out, so it can explain how to sign back in).</summary>
+    private void UpdateRequestButton() => RequestButton.Visibility = Ui.Show(Services.Requester.Url is not null);
+
+    /// <summary>Opens the Request page, searching Audible for <paramref name="query"/> when given.</summary>
+    public void OpenRequests(string? query = null) => ContentFrame.Navigate(typeof(RequestsPage), query);
+
+    /// <summary>What's in the library search box.</summary>
+    public string SearchText => SearchBox.Text;
+
+    private void OnRequestsClick(object sender, RoutedEventArgs e)
+    {
+        if (ContentFrame.CurrentSourcePageType != typeof(RequestsPage)) OpenRequests();
     }
 
     private void OnSettingsClick(object sender, RoutedEventArgs e)

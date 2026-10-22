@@ -31,6 +31,19 @@
                 </StackPanel>
             </Grid>
 
+            <TextBlock Text="Audiobook Requester" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap" FontSize="13"
+                           Text="Connect your Audiobook Requester to ask for books that aren't in the library yet, right from this app. You sign in with your Audiobookshelf username and password." />
+                <TextBox x:Name="RequesterUrl" Header="Requester address" PlaceholderText="requests.example.com or 192.168.1.10:5066" IsSpellCheckEnabled="False" InputScope="Url" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="RequesterConnect" Content="Connect…" Click="OnRequesterConnect" Style="{StaticResource AccentButtonStyle}" />
+                    <Button x:Name="RequesterDisconnect" Content="Disconnect" Click="OnRequesterDisconnect" />
+                    <ProgressRing x:Name="RequesterBusy" Width="20" Height="20" IsActive="False" />
+                </StackPanel>
+                <TextBlock x:Name="RequesterStatus" TextWrapping="Wrap" />
+            </StackPanel>
+
             <TextBlock Text="Playback" Style="{StaticResource SectionHeader}" />
             <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
                 <ComboBox x:Name="SkipBack" Header="Skip back" MinWidth="200" SelectionChanged="OnSkipBackChanged" />

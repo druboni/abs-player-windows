@@ -1,5 +1,6 @@
 using AbsPlayer.Core;
 using AbsPlayer.Core.Playback;
+using AbsPlayer.Core.Requester;
 using AbsPlayer.Core.Storage;
 using Microsoft.UI.Dispatching;
 
@@ -18,6 +19,7 @@ public static class Services
     public static PlaybackController Playback { get; private set; } = null!;
     public static LibraryModel Library { get; private set; } = null!;
     public static UpdateChecker Updates { get; private set; } = null!;
+    public static RequesterClient Requester { get; private set; } = null!;
     public static DispatcherQueue Dispatcher { get; private set; } = null!;
 
     public static void Initialize()
@@ -31,7 +33,8 @@ public static class Services
 
         var dir = AppConfig.DataDirectory;
         Settings = new SettingsStore(Path.Combine(dir, "settings.json"));
-        User = new UserPreferences(Settings, new CredentialLockerStore());
+        var secrets = new CredentialLockerStore();
+        User = new UserPreferences(Settings, secrets);
         Prefs = new Prefs(Settings);
         Http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
         Http.DefaultRequestHeaders.UserAgent.ParseAdd($"ABSPlayerWindows/{AppConfig.Version}");
@@ -42,5 +45,6 @@ public static class Services
         Playback = new PlaybackController(Repository, Audio, Progress, Prefs, dispatch: Dispatch);
         Library = new LibraryModel(Repository, Prefs);
         Updates = new UpdateChecker(Http, Settings, AppConfig.Version);
+        Requester = new RequesterClient(Settings, secrets, Http);
     }
 }

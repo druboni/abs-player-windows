@@ -52,6 +52,14 @@ dotnet test --filter LiveServerTests
 ## Continuous build
 `.github/workflows/build.yml` runs the tests and builds the installer on every push and pull request. The real-audio tests are skipped there. Pushing a tag such as `v0.2.0` also attaches the installer to that release.
 
+## Audiobook Requester
+If you run [Audiobook Requester](https://github.com/druboni/audiobook-requester), add its address in **Settings → Audiobook Requester** and sign in with your Audiobookshelf username and password. A **Request** button then appears in the top bar, with three tabs:
+- **Search:** search Audible, see what's already in the library, and request books with an optional note.
+- **My Requests:** status and download progress for each request, and **Listen** once a book arrives in the library.
+- **Approvals:** admins only. Approve or decline pending requests.
+
+Library search also offers "Request it" when a book isn't in your library.
+
 ## Download
 Installers are on the [Releases page](https://github.com/druboni/abs-player-windows/releases). Uninstall from Windows Settings → Apps.
 
@@ -65,6 +73,8 @@ Every signed release is built from this repository by GitHub Actions (`.github/w
 
 ## Privacy
 This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. It contacts the Audiobookshelf server you sign in to. There is no analytics, tracking or telemetry.
+
+If you connect [Audiobook Requester](https://github.com/druboni/audiobook-requester) in Settings, it also contacts that server, at the address you enter, to search for and request books.
 
 The one exception is the update check. Once a day it asks GitHub's public API (`api.github.com`) for the latest release of this app, and it downloads the installer from GitHub when you choose **Download and install**. These requests carry no account, library or listening data. Turn the check off in **Settings → Updates**.
 
