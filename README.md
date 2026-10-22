@@ -22,8 +22,7 @@ tests/AbsPlayer.Core.Tests/  xUnit tests
 ## Building and running
 ```
 dotnet build src/AbsPlayer.App -p:Platform=x64
-src\AbsPlayer.Appind\Debug
-et10.0-windows10.0.19041.0\win-x64\ABSPlayer.exe
+src\AbsPlayer.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ABSPlayer.exe
 ```
 
 Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager), never in the settings file.
