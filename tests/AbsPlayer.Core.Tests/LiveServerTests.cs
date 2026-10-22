@@ -87,6 +87,31 @@ public class LiveServerTests
         await repo.GetContinueListening();
     }
 
+    /// <summary>Streams a real book through the Windows engine at volume 0. No session is opened.</summary>
+    [LiveFact]
+    public async Task Windows_engine_streams_a_real_book()
+    {
+        var (env, repo) = Connect();
+        using var _ = env;
+        var lib = (await repo.GetLibraries()).First(l => l.Icon != "podcast");
+        var first = (await repo.GetLibraryItems(lib.Id, LibrarySort.Title, limit: 1)).Results[0];
+        var track = (await repo.GetItem(first.Id)).Media.Tracks!.OrderBy(t => t.Index).First();
+        var url = repo.MediaUrl(track.ContentUrl!)!;
+
+        var (engine, _) = Playback.SmtcNowPlaying.Create();
+        using var __ = engine;
+        string? failure = null;
+        engine.Failed += (_, m) => failure = m;
+        engine.Volume = 0;
+        engine.Open([url], 0, 60); // Start a minute in, which needs a ranged request.
+        engine.Play();
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        while (engine.LocalPosition < 61.5 && failure is null && sw.ElapsedMilliseconds < 20_000) await Task.Delay(100);
+        engine.Close();
+        Assert.Null(failure);
+        Assert.True(sw.ElapsedMilliseconds < 20_000, "stream didn't reach 61.5 s within 20 s");
+    }
+
     [LiveFact]
     public async Task Bad_token_is_unauthorized()
     {

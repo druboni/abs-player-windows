@@ -12,6 +12,9 @@ src/AbsPlayer.Core/          No UI. Ported from abs-player-apple/Shared.
   Storage/                   Settings file, Credential Locker tokens, user preferences
   AudiobookRepository.cs     What the UI calls
   LocalProgressStore.cs      Position saved on this device; sent to the server once back online
+  Playback/                  PlaybackController (sessions, sync, chapters, sleep timer, bookmarks),
+                             AudioPlayer (multi-file books in whole-book time), and the Windows pieces:
+                             WindowsMediaEngine (Windows.Media.Playback) and SmtcNowPlaying (media overlay + keys)
 tests/AbsPlayer.Core.Tests/  xUnit tests
 ```
 
@@ -21,9 +24,10 @@ Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows C
 ```
 dotnet test
 ```
-Most tests run against a fake HTTP handler and need no server.
+Most tests run against a fake HTTP handler, a fake audio engine and a fake clock, and need no server.
+`WindowsEngineTests` run the real Windows engine on generated silent WAV files at volume 0: nothing is audible and no window opens.
 
-`LiveServerTests` are read-only checks against a real server. They don't start sessions, change progress or touch bookmarks. They're skipped unless both of these are set:
+`LiveServerTests` are read-only checks against a real server. They don't start sessions, change progress or touch bookmarks. One streams a real book through the Windows engine at volume 0. They're skipped unless both of these are set:
 ```powershell
 $env:ABS_LIVE_URL = "https://abs.example.com"
 $env:ABS_LIVE_TOKEN = "<an Audiobookshelf API key or user token>"
@@ -32,7 +36,7 @@ dotnet test --filter LiveServerTests
 
 ## Status
 - [x] Step 1: API client, models, repository, token storage, offline progress
-- [ ] Step 2: playback and sync (Windows media player, media keys and overlay)
+- [x] Step 2: playback and sync (Windows media player, media keys and overlay)
 - [ ] Step 3: screens (sign-in, library, book detail, player, settings)
 - [ ] Step 4: downloads and offline playback
 - [ ] Step 5: installer

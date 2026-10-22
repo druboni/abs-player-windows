@@ -43,6 +43,8 @@ public sealed class Prefs(SettingsStore settings)
     public const int DefaultSkip = 30;
     public const int DefaultRewind = 0;
 
+    public SettingsStore Settings => settings;
+
     public int SkipBack
     {
         get => settings.Get<int?>(Key.SkipBack) ?? DefaultSkip;
