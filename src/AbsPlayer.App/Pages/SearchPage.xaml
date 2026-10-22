@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AbsPlayer.App.Pages.SearchPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="using:AbsPlayer.App">
+    <ScrollViewer>
+        <StackPanel Padding="24,8,24,24" Spacing="4">
+            <ProgressRing x:Name="Searching" IsActive="False" HorizontalAlignment="Center" Margin="0,40" />
+            <TextBlock x:Name="NoResults" Text="No results" Style="{StaticResource Secondary}" FontSize="14" HorizontalAlignment="Center" Margin="0,40" Visibility="Collapsed" />
+
+            <StackPanel x:Name="AuthorsSection" Visibility="Collapsed">
+                <TextBlock Text="Authors" Style="{StaticResource SectionHeader}" />
+                <ListView x:Name="Authors" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnAuthorClick" MaxWidth="700" HorizontalAlignment="Left">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="app:AuthorVm">
+                            <Grid ColumnSpacing="12" Padding="0,8" MinWidth="400">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon Glyph="&#xE77B;" Foreground="{StaticResource AccentText}" />
+                                <TextBlock Grid.Column="1" Text="{x:Bind Name}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="{x:Bind CountLabel}" Style="{StaticResource Secondary}" VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+
+            <StackPanel x:Name="SeriesSection" Visibility="Collapsed">
+                <TextBlock Text="Series" Style="{StaticResource SectionHeader}" />
+                <GridView x:Name="Series" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnSeriesClick" ItemTemplate="{StaticResource SeriesTile}" />
+            </StackPanel>
+
+            <StackPanel x:Name="BooksSection" Visibility="Collapsed">
+                <TextBlock Text="Books" Style="{StaticResource SectionHeader}" />
+                <GridView x:Name="Books" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnBookClick" ItemTemplate="{StaticResource BookTile}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

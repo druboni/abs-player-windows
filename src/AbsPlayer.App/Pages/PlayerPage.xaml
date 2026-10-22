@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AbsPlayer.App.Pages.PlayerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AbsPlayer.App.Pages"
+    xmlns:models="using:AbsPlayer.Core.Models">
+    <Grid x:Name="Layout">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="PanelColumn" Width="380" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Player -->
+        <ScrollViewer>
+            <Grid Padding="24,8,24,24">
+                <TextBlock x:Name="StatusText" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Margin="0,80" Visibility="Collapsed" />
+                <ProgressRing x:Name="LoadingRing" IsActive="False" Width="48" Height="48" VerticalAlignment="Top" Margin="0,120" />
+
+                <StackPanel x:Name="Player" MaxWidth="520" Spacing="12" Visibility="Collapsed">
+                    <Grid Width="320" Height="320" CornerRadius="14" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Center">
+                        <FontIcon Glyph="&#xE7F6;" FontSize="64" Opacity="0.25" />
+                        <Image x:Name="Cover" Stretch="UniformToFill" />
+                    </Grid>
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Name="TitleText" Style="{StaticResource SubtitleTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap" MaxLines="2" HorizontalAlignment="Center" />
+                        <TextBlock x:Name="AuthorText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                        <HyperlinkButton x:Name="ChapterButton" Click="OnShowChapters" HorizontalAlignment="Center" Padding="6,2">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock x:Name="ChapterText" TextTrimming="CharacterEllipsis" MaxWidth="440" />
+                                <FontIcon Glyph="&#xE70D;" FontSize="10" />
+                            </StackPanel>
+                        </HyperlinkButton>
+                        <Button x:Name="BookmarkButton" Click="OnAddBookmark" HorizontalAlignment="Center" Padding="10,4" Margin="0,4,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon x:Name="BookmarkIcon" Glyph="&#xE8A4;" FontSize="12" />
+                                <TextBlock x:Name="BookmarkText" Text="Add Bookmark" FontSize="12" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Scrubber covers the current chapter (or the whole book without chapters). -->
+                    <StackPanel Spacing="0">
+                        <Slider x:Name="Scrubber" Minimum="0" StepFrequency="1" IsThumbToolTipEnabled="False" ValueChanged="OnScrubberChanged" />
+                        <Grid>
+                            <TextBlock x:Name="ElapsedText" Style="{StaticResource Secondary}" />
+                            <TextBlock x:Name="RemainingText" Style="{StaticResource Secondary}" HorizontalAlignment="Right" />
+                        </Grid>
+                        <TextBlock x:Name="TimeLeftText" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,6,0,0" TextWrapping="Wrap" TextAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                        <Button Click="OnPreviousChapter" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Previous chapter (Ctrl+Shift+Left)" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE892;" FontSize="22" />
+                        </Button>
+                        <Button Click="OnSkipBack" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                            <StackPanel>
+                                <FontIcon Glyph="&#xEB9E;" FontSize="26" />
+                                <TextBlock x:Name="SkipBackText" FontSize="10" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="PlayButton" Click="OnToggle" Width="72" Height="72" CornerRadius="36" Style="{StaticResource AccentButtonStyle}"
+                                ToolTipService.ToolTip="Play/Pause (Space)">
+                            <FontIcon x:Name="PlayIcon" Glyph="&#xE768;" FontSize="28" />
+                        </Button>
+                        <Button Click="OnSkipForward" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                            <StackPanel>
+                                <FontIcon Glyph="&#xEB9D;" FontSize="26" />
+                                <TextBlock x:Name="SkipForwardText" FontSize="10" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="NextChapterButton" Click="OnNextChapter" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Next chapter (Ctrl+Shift+Right)" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE893;" FontSize="22" />
+                        </Button>
+                    </StackPanel>
+
+                    <Grid Margin="0,8,0,0">
+                        <DropDownButton x:Name="SpeedButton" ToolTipService.ToolTip="Playback speed (Ctrl+0 cycles)">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xEC4A;" FontSize="14" />
+                                <TextBlock x:Name="SpeedText" />
+                            </StackPanel>
+                            <DropDownButton.Flyout>
+                                <MenuFlyout x:Name="SpeedMenu" Placement="Top" />
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                        <DropDownButton x:Name="SleepButton" HorizontalAlignment="Center" ToolTipService.ToolTip="Sleep timer">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon x:Name="SleepIcon" Glyph="&#xE708;" FontSize="14" />
+                                <TextBlock x:Name="SleepText" Text="Sleep" />
+                            </StackPanel>
+                            <DropDownButton.Flyout>
+                                <MenuFlyout x:Name="SleepMenu" Placement="Top" Opening="OnSleepMenuOpening" />
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                        <ToggleButton x:Name="PanelToggle" HorizontalAlignment="Right" IsChecked="True" Click="OnPanelToggle" ToolTipService.ToolTip="Chapters and bookmarks">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xE8FD;" FontSize="14" />
+                                <TextBlock Text="Chapters" />
+                            </StackPanel>
+                        </ToggleButton>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Chapters and bookmarks -->
+        <Grid x:Name="Panel" Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <SelectorBar x:Name="PanelTabs" SelectionChanged="OnPanelTabChanged" Margin="12,8">
+                <SelectorBarItem x:Name="ChaptersTab" Text="Chapters" IsSelected="True" />
+                <SelectorBarItem x:Name="BookmarksTab" Text="Bookmarks" />
+            </SelectorBar>
+            <ListView x:Name="ChapterList" Grid.Row="1" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnChapterClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PlayerChapterRow">
+                        <Grid ColumnSpacing="8" Padding="0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE995;" FontSize="12" Foreground="{StaticResource AccentText}" Visibility="{x:Bind CurrentVisibility}" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Title}" Foreground="{x:Bind TitleBrush}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind Start}" Style="{StaticResource Secondary}" VerticalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ListView x:Name="BookmarkList" Grid.Row="1" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnBookmarkClick" Visibility="Collapsed">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Bookmark">
+                        <Grid ColumnSpacing="8" Padding="0,6" Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Rename…" Icon="Rename" Click="OnRenameBookmark" Tag="{x:Bind}" />
+                                    <MenuFlyoutItem Text="Delete" Icon="Delete" Click="OnDeleteBookmark" Tag="{x:Bind}" />
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+                            <FontIcon Glyph="&#xE8A4;" FontSize="12" Foreground="{StaticResource AccentText}" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Title}" TextWrapping="Wrap" MaxLines="2" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind local:PlayerPage.Time(Time)}" Style="{StaticResource Secondary}" VerticalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock x:Name="PanelEmpty" Grid.Row="1" Style="{StaticResource Secondary}" FontSize="14" TextWrapping="Wrap" TextAlignment="Center"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24" Visibility="Collapsed" />
+        </Grid>
+    </Grid>
+</Page>

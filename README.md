@@ -15,7 +15,15 @@ src/AbsPlayer.Core/          No UI. Ported from abs-player-apple/Shared.
   Playback/                  PlaybackController (sessions, sync, chapters, sleep timer, bookmarks),
                              AudioPlayer (multi-file books in whole-book time), and the Windows pieces:
                              WindowsMediaEngine (Windows.Media.Playback) and SmtcNowPlaying (media overlay + keys)
+src/AbsPlayer.App/           WinUI 3 app (unpackaged, Windows App SDK bundled): shell, pages, Now Playing bar
 tests/AbsPlayer.Core.Tests/  xUnit tests
+```
+
+## Building and running
+```
+dotnet build src/AbsPlayer.App -p:Platform=x64
+src\AbsPlayer.Appind\Debug
+et10.0-windows10.0.19041.0\win-x64\ABSPlayer.exe
 ```
 
 Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager), never in the settings file.
@@ -37,6 +45,6 @@ dotnet test --filter LiveServerTests
 ## Status
 - [x] Step 1: API client, models, repository, token storage, offline progress
 - [x] Step 2: playback and sync (Windows media player, media keys and overlay)
-- [ ] Step 3: screens (sign-in, library, book detail, player, settings)
+- [ ] Step 3: screens (sign-in, library, book detail, player, settings) — built, not yet tried on screen
 - [ ] Step 4: downloads and offline playback
 - [ ] Step 5: installer

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="AbsPlayer.App.NowPlayingBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ProgressBar x:Name="Progress" Maximum="1" MinHeight="3" CornerRadius="0" />
+        <Grid Grid.Row="1" Padding="12,8" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <!-- Clicking the book opens the full player. -->
+            <Button x:Name="OpenPlayer" Click="OnOpenPlayer" Background="Transparent" BorderThickness="0" Padding="0"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" ToolTipService.ToolTip="Open player">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Width="48" Height="48" CornerRadius="6" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                        <Image x:Name="Cover" Stretch="UniformToFill" />
+                    </Grid>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="TitleText" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock x:Name="DetailText" Style="{StaticResource Secondary}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Grid>
+            </Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <ProgressRing x:Name="LoadingRing" Width="24" Height="24" IsActive="False" Margin="0,0,8,0" />
+                <Button Click="OnSkipBack" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Skip back (Ctrl+Left)">
+                    <FontIcon Glyph="&#xEB9E;" FontSize="18" />
+                </Button>
+                <Button Click="OnToggle" Width="48" Height="48" CornerRadius="24" Style="{StaticResource AccentButtonStyle}"
+                        ToolTipService.ToolTip="Play/Pause (Ctrl+P)">
+                    <FontIcon x:Name="PlayIcon" Glyph="&#xE768;" FontSize="18" />
+                </Button>
+                <Button Click="OnSkipForward" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Skip forward (Ctrl+Right)">
+                    <FontIcon Glyph="&#xEB9D;" FontSize="18" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

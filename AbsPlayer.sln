@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbsPlayer.Core.Tests", "tests\AbsPlayer.Core.Tests\AbsPlayer.Core.Tests.csproj", "{3EE69027-195D-4143-85FA-9B1E3363A04E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbsPlayer.App", "src\AbsPlayer.App\AbsPlayer.App.csproj", "{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,18 @@ Global
 		{3EE69027-195D-4143-85FA-9B1E3363A04E}.Release|x64.Build.0 = Release|Any CPU
 		{3EE69027-195D-4143-85FA-9B1E3363A04E}.Release|x86.ActiveCfg = Release|Any CPU
 		{3EE69027-195D-4143-85FA-9B1E3363A04E}.Release|x86.Build.0 = Release|Any CPU
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|Any CPU.Build.0 = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|x64.ActiveCfg = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|x64.Build.0 = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|x86.ActiveCfg = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Debug|x86.Build.0 = Debug|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|Any CPU.ActiveCfg = Release|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|Any CPU.Build.0 = Release|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|x64.ActiveCfg = Release|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|x64.Build.0 = Release|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|x86.ActiveCfg = Release|x64
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,5 +66,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{13DEB55C-F785-4A9D-9013-AF2B9319BAA4} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{3EE69027-195D-4143-85FA-9B1E3363A04E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{282E1CFC-2E7E-410F-9A4A-ADF29926D0FE} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

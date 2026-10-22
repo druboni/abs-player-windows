@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AbsPlayer.App.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" Padding="24,8,24,24" Spacing="4" HorizontalAlignment="Stretch">
+            <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,8" />
+
+            <TextBlock Text="Account" Style="{StaticResource SectionHeader}" />
+            <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" RowSpacing="8" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Server" />
+                <TextBlock x:Name="ServerText" Grid.Column="1" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+                <TextBlock Grid.Row="1" Text="Signed in as" />
+                <TextBlock x:Name="UserText" Grid.Row="1" Grid.Column="1" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Grid.Row="2" Text="Audiobookshelf" />
+                <TextBlock x:Name="VersionText" Grid.Row="2" Grid.Column="1" Text="…" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                    <Button Content="Switch Server…" Click="OnSwitchServer" />
+                    <Button Content="Sign Out" Click="OnSignOut" />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="Playback" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
+                <ComboBox x:Name="SkipBack" Header="Skip back" MinWidth="200" SelectionChanged="OnSkipBackChanged" />
+                <ComboBox x:Name="SkipForward" Header="Skip forward" MinWidth="200" SelectionChanged="OnSkipForwardChanged" />
+                <ComboBox x:Name="Rewind" Header="Rewind when resuming" MinWidth="200" SelectionChanged="OnRewindChanged" />
+                <ComboBox x:Name="Speed" Header="Playback speed" MinWidth="200" SelectionChanged="OnSpeedChanged" />
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap"
+                           Text="Rewind when resuming backs up a few seconds after you pause, so you don't lose your place. The keyboard media keys and the Windows media overlay work while the app is in the background." />
+            </StackPanel>
+
+            <TextBlock Text="Library" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
+                <ComboBox x:Name="Sort" Header="Sort by" MinWidth="200" SelectionChanged="OnSortChanged" />
+                <ToggleSwitch x:Name="HideFinished" Header="Hide finished books" Toggled="OnHideFinishedToggled" />
+            </StackPanel>
+
+            <TextBlock Text="Keyboard shortcuts" Style="{StaticResource SectionHeader}" />
+            <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" RowSpacing="6" ColumnSpacing="24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Ctrl+P (Space in the player)" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="Play / Pause" />
+                <TextBlock Grid.Row="1" Text="Ctrl+Left / Ctrl+Right" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Skip back / forward" />
+                <TextBlock Grid.Row="2" Text="Ctrl+Shift+Left / Right" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="Previous / next chapter" />
+                <TextBlock Grid.Row="3" Text="Ctrl+0" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="Change speed" />
+                <TextBlock Grid.Row="4" Text="Ctrl+F" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="Search" />
+                <TextBlock Grid.Row="5" Text="Alt+Left" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="Back" />
+            </Grid>
+
+            <TextBlock Text="About" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="4">
+                <TextBlock x:Name="AppVersionText" />
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap" Text="ABS Player is an independent app and is not affiliated with the Audiobookshelf project." />
+                <HyperlinkButton Content="Audiobookshelf website" NavigateUri="https://www.audiobookshelf.org" Padding="0" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

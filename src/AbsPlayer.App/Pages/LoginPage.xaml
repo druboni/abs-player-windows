@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AbsPlayer.App.Pages.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer>
+        <StackPanel MaxWidth="360" Spacing="16" Padding="32" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <FontIcon Glyph="&#xE7F6;" FontSize="56" Foreground="{StaticResource AccentText}" />
+            <TextBlock Text="ABS Player" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="Sign in to your Audiobookshelf server" Style="{StaticResource Secondary}" HorizontalAlignment="Center" />
+
+            <TextBox x:Name="Server" Header="Server address" PlaceholderText="abs.example.com or 192.168.1.10:13378"
+                     InputScope="Url" IsSpellCheckEnabled="False" TextChanged="OnInputChanged" />
+            <TextBox x:Name="Username" Header="Username" IsSpellCheckEnabled="False" TextChanged="OnInputChanged" />
+            <PasswordBox x:Name="Password" Header="Password" KeyDown="OnPasswordKeyDown" />
+
+            <TextBlock x:Name="ErrorText" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap"
+                       HorizontalAlignment="Center" TextAlignment="Center" Visibility="Collapsed" />
+
+            <Button x:Name="SignInButton" Click="OnSignIn" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch"
+                    Height="40" IsEnabled="False">
+                <Grid>
+                    <TextBlock x:Name="SignInText" Text="Sign In" />
+                    <ProgressRing x:Name="Busy" Width="20" Height="20" IsActive="False" Foreground="White" />
+                </Grid>
+            </Button>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

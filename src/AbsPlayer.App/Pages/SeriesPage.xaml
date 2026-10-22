@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AbsPlayer.App.Pages.SeriesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Padding="24,8,24,0" RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" />
+        <ListView x:Name="Books" Grid.Row="1" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnBookClick"
+                  ItemTemplate="{StaticResource BookRow}" MaxWidth="800" HorizontalAlignment="Left" />
+    </Grid>
+</Page>
