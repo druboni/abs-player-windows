@@ -35,6 +35,17 @@ public sealed partial class PlayerPage : Page
     private string? _shownItem;
     private IReadOnlyList<Bookmark>? _shownBookmarks;
     private CancellationTokenSource? _bookmarkReset;
+    private bool? _narrow;
+
+    /// <summary>Below ~880 px the chapters panel would squeeze the player, so it folds away (the Chapters button brings it back).</summary>
+    private void OnLayoutSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var narrow = e.NewSize.Width < 880;
+        if (narrow == _narrow) return;
+        _narrow = narrow;
+        PanelToggle.IsChecked = !narrow;
+        Render();
+    }
 
     public PlayerPage()
     {

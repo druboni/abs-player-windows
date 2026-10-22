@@ -9,7 +9,7 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="Root">
+    <Grid x:Name="Root" SizeChanged="OnRootSizeChanged">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -44,14 +44,14 @@
             </Button>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <FontIcon Glyph="&#xE7F6;" Foreground="{StaticResource AccentText}" FontSize="18" />
-                <TextBlock Text="ABS Player" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock x:Name="AppTitle" Text="ABS Player" Style="{StaticResource BodyStrongTextBlockStyle}" />
             </StackPanel>
             <AutoSuggestBox x:Name="SearchBox" Grid.Column="3" Width="320" PlaceholderText="Titles, authors, series"
                             QueryIcon="Find" TextChanged="OnSearchTextChanged" VerticalAlignment="Center" />
             <Button x:Name="RequestButton" Grid.Column="4" Click="OnRequestsClick" ToolTipService.ToolTip="Request a book (Audiobook Requester)" Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon Glyph="&#xE710;" FontSize="14" />
-                    <TextBlock Text="Request" />
+                    <TextBlock x:Name="RequestLabel" Text="Request" />
                 </StackPanel>
             </Button>
             <ComboBox x:Name="LibraryPicker" Grid.Column="5" MinWidth="160" VerticalAlignment="Center"
@@ -63,8 +63,11 @@
             </Button>
         </Grid>
 
+        <StackPanel Grid.Row="1">
+        <!-- Something went wrong but the app kept running. -->
+        <InfoBar x:Name="ErrorBar" Margin="12,0,12,8" Severity="Error" IsOpen="False" Title="Something went wrong" />
         <!-- Shown when a newer release is on GitHub. -->
-        <InfoBar x:Name="UpdateBar" Grid.Row="1" Margin="12,0,12,8" Severity="Informational" IsOpen="False" Title="Update available">
+        <InfoBar x:Name="UpdateBar" Margin="12,0,12,8" Severity="Informational" IsOpen="False" Title="Update available">
             <InfoBar.ActionButton>
                 <Button x:Name="UpdateButton" Content="Download and install" Click="OnInstallUpdate" Style="{StaticResource AccentButtonStyle}" />
             </InfoBar.ActionButton>
@@ -75,6 +78,7 @@
                 </StackPanel>
             </InfoBar.Content>
         </InfoBar>
+        </StackPanel>
 
         <Frame x:Name="ContentFrame" Grid.Row="2" Navigated="OnNavigated" />
 

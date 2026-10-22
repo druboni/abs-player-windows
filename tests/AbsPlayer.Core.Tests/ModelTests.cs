@@ -80,6 +80,16 @@ public class ModelTests
     }
 
     [Fact]
+    public void A_bad_chapter_doesnt_make_the_book_unplayable()
+    {
+        var s = Parse<PlaybackSessionResponse>("{'id':'s','libraryItemId':'b','duration':10,'currentTime':0,"
+            + "'audioTracks':[{'index':1,'startOffset':0,'duration':10,'contentUrl':'/f'}],"
+            + "'chapters':[{'id':0,'start':0,'end':5,'title':'One'},{'id':1,'start':5,'end':10,'title':null}]}");
+        Assert.Single(s.AudioTracks);
+        Assert.Equal(["One"], s.Chapters.Select(c => c.Title));
+    }
+
+    [Fact]
     public void Requests_serialize_camel_case()
     {
         var json = JsonSerializer.Serialize(new PlayItemRequest

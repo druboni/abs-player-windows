@@ -72,17 +72,15 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <StackPanel>
-                <TextBlock Text="Request a Book" Style="{StaticResource TitleTextBlockStyle}" />
-                <TextBlock x:Name="SubtitleText" Style="{StaticResource Secondary}" FontSize="13" />
-            </StackPanel>
-            <SelectorBar x:Name="Tabs" HorizontalAlignment="Right" VerticalAlignment="Bottom" SelectionChanged="OnTabChanged">
+        <StackPanel>
+            <TextBlock Text="Request a Book" Style="{StaticResource TitleTextBlockStyle}" />
+            <TextBlock x:Name="SubtitleText" Style="{StaticResource Secondary}" FontSize="13" TextWrapping="Wrap" />
+            <SelectorBar x:Name="Tabs" Margin="-12,4,0,0" SelectionChanged="OnTabChanged">
                 <SelectorBarItem x:Name="SearchTab" Text="Search" IsSelected="True" />
                 <SelectorBarItem x:Name="MineTab" Text="My Requests" />
                 <SelectorBarItem x:Name="ApprovalsTab" Text="Approvals" Visibility="Collapsed" />
             </SelectorBar>
-        </Grid>
+        </StackPanel>
 
         <!-- Not set up yet -->
         <StackPanel x:Name="NotConnected" Grid.Row="1" Grid.RowSpan="2" Spacing="12" Margin="0,40" HorizontalAlignment="Center" Visibility="Collapsed" MaxWidth="460">
@@ -99,7 +97,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <AutoSuggestBox x:Name="QueryBox" PlaceholderText="Search Audible by title, author or narrator" QueryIcon="Find" MaxWidth="600" HorizontalAlignment="Left" Width="600"
+            <AutoSuggestBox x:Name="QueryBox" PlaceholderText="Search Audible by title, author or narrator" QueryIcon="Find" MaxWidth="600" HorizontalAlignment="Stretch"
                             QuerySubmitted="OnQuerySubmitted" />
             <ListView x:Name="Results" Grid.Row="1" SelectionMode="None" ItemTemplate="{StaticResource ResultRow}" MaxWidth="900" HorizontalAlignment="Left" />
             <ProgressRing x:Name="Searching" Grid.Row="1" IsActive="False" VerticalAlignment="Top" Margin="0,40" />

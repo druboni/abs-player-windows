@@ -43,7 +43,14 @@ public sealed class WindowsMediaEngine : IMediaEngine, IDisposable
         var list = new MediaPlaybackList { AutoRepeatEnabled = false, MaxPlayedItemsToKeepOpen = 1 };
         foreach (var url in urls)
             list.Items.Add(new MediaPlaybackItem(MediaSource.CreateFromUri(url)));
-        list.CurrentItemChanged += (_, _) => TryApplyPending();
+        list.CurrentItemChanged += (_, _) =>
+        {
+            // Each file starts at the session's rate on some systems; keep the listener's speed.
+            double rate;
+            lock (_lock) rate = _rate;
+            _player.PlaybackSession.PlaybackRate = rate;
+            TryApplyPending();
+        };
         list.ItemFailed += (_, e) => Failed?.Invoke(this, e.Error.ErrorCode.ToString());
         if (index > 0 && index < list.Items.Count) list.StartingItem = list.Items[index];
         lock (_lock)

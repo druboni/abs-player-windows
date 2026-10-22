@@ -41,10 +41,15 @@ public sealed class LibrariesResponse
     public required List<Library> Libraries { get; init; }
 }
 
-public sealed record Library(string Id, string Name, string? Icon);
+public sealed record Library(string Id, string Name, string? Icon, string? MediaType = null)
+{
+    /// <summary>Podcast libraries aren't supported (playing an episode needs an episode id).</summary>
+    public bool IsBooks => MediaType is null or "book";
+}
 
 public sealed class LibraryItemsResponse
 {
+    [JsonConverter(typeof(LossyListConverter<LibraryItem>))]
     public required List<LibraryItem> Results { get; init; }
     public int Total { get; init; }
     public int Limit { get; init; }
@@ -55,6 +60,8 @@ public sealed partial class LibraryItem : IEquatable<LibraryItem>
 {
     public required string Id { get; init; }
     public string? LibraryId { get; init; }
+    /// <summary>"book" or "podcast".</summary>
+    public string? MediaType { get; init; }
     public required Media Media { get; init; }
     /// <summary>Some series endpoints put the book's number here instead of in the metadata.</summary>
     public string? SeriesSequence { get; init; }
@@ -93,6 +100,7 @@ public sealed class Media
     public required Metadata Metadata { get; init; }
     public string? CoverPath { get; init; }
     public double? Duration { get; init; }
+    [JsonConverter(typeof(LossyListConverter<Chapter>))]
     public List<Chapter>? Chapters { get; init; }
     /// <summary>Present on expanded items; used to download the audio files.</summary>
     public List<AudioTrack>? Tracks { get; init; }
@@ -126,7 +134,9 @@ public sealed class PlaybackSessionResponse
     public required string LibraryItemId { get; init; }
     public string? DisplayTitle { get; init; }
     public string? DisplayAuthor { get; init; }
+    [JsonConverter(typeof(LossyListConverter<AudioTrack>))]
     public required List<AudioTrack> AudioTracks { get; init; }
+    [JsonConverter(typeof(LossyListConverter<Chapter>))]
     public required List<Chapter> Chapters { get; init; }
     public double Duration { get; init; }
     public double CurrentTime { get; init; }
@@ -170,7 +180,9 @@ public sealed record ProgressUpdateRequest(double CurrentTime, double Duration, 
 
 public sealed class MeResponse
 {
+    [JsonConverter(typeof(LossyListConverter<ProgressEntry>))]
     public List<ProgressEntry>? MediaProgress { get; init; }
+    [JsonConverter(typeof(LossyListConverter<Bookmark>))]
     public List<Bookmark>? Bookmarks { get; init; }
 }
 

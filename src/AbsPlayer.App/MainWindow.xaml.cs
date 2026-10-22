@@ -128,11 +128,37 @@ public sealed partial class MainWindow : Window
         _pickingLibrary = false;
     }
 
+    private bool _signingOut;
+
     public async void SignOut(bool forgetServer)
     {
-        await Services.Playback.Stop();
-        Services.Repository.Logout(forgetServer);
-        ShowLogin();
+        // An expired sign-in can be reported by several requests at once.
+        if (_signingOut) return;
+        _signingOut = true;
+        try
+        {
+            await Services.Playback.Stop();
+            Services.Repository.Logout(forgetServer);
+            ShowLogin();
+        }
+        finally { _signingOut = false; }
+    }
+
+    /// <summary>Shows an error that didn't stop the app.</summary>
+    public void ShowError(string message)
+    {
+        ErrorBar.Message = $@"{message} Details are in %LOCALAPPDATA%\ABSPlayer\crash.log.";
+        ErrorBar.IsOpen = true;
+    }
+
+    /// <summary>Squeezes the top bar on narrow windows so the settings button never falls off the edge.</summary>
+    private void OnRootSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var w = e.NewSize.Width;
+        SearchBox.Width = Math.Clamp(w - 620, 160, 320);
+        AppTitle.Visibility = Ui.Show(w >= 820);
+        RequestLabel.Visibility = Ui.Show(w >= 720);
+        LibraryPicker.MinWidth = w >= 820 ? 160 : 110;
     }
 
     // Navigation

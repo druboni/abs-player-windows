@@ -201,6 +201,39 @@ public class PlaybackControllerTests
     }
 
     [Fact]
+    public async Task Switching_books_while_loading_closes_the_abandoned_session()
+    {
+        using var h = new PlaybackHarness();
+        var gate = new TaskCompletionSource();
+        var inner = h.Env.Handler.Respond;
+        h.Env.Handler.Respond = async req =>
+        {
+            if (req.RequestUri!.AbsolutePath == "/api/items/b1/play") await gate.Task; // b1 is slow to start.
+            if (req.RequestUri.AbsolutePath == "/api/items/empty/play")
+                return StubHandler.Json("""{"id":"sess2","libraryItemId":"empty","duration":10,"currentTime":0,"audioTracks":[{"index":1,"startOffset":0,"duration":10,"contentUrl":"/f"}],"chapters":[]}""");
+            return await inner(req);
+        };
+
+        var first = h.Controller.Play("b1");
+        await h.Controller.Play("empty"); // Picked another book before b1 finished loading.
+        gate.SetResult();
+        await first;
+        await Task.Delay(50);
+
+        Assert.Equal("empty", h.Controller.ItemId);
+        Assert.Single(h.Calls("POST", "/api/session/sess1/close")); // b1's session closed, not left open.
+    }
+
+    [Fact]
+    public async Task Overlay_position_is_refreshed_while_playing()
+    {
+        using var h = new PlaybackHarness();
+        await h.Controller.Play("b1", startAt: 100);
+        await h.Run(5);
+        Assert.Equal(105, h.NowPlaying.State!.Value.Position);
+    }
+
+    [Fact]
     public async Task Chapter_buttons()
     {
         using var h = new PlaybackHarness();

@@ -166,7 +166,12 @@ public sealed class PlaybackController : INotifyPropertyChanged
             try
             {
                 var s = await _repository.StartPlaybackSession(id);
-                if (ItemId != id) return;
+                if (ItemId != id)
+                {
+                    // Another book was picked while this one loaded: don't leave its session open on the server.
+                    _ = CloseQuietly(s.Id);
+                    return;
+                }
                 _sessionId = s.Id;
                 Title = s.DisplayTitle ?? downloaded?.Title ?? "";
                 Author = s.DisplayAuthor ?? downloaded?.Author;
@@ -441,7 +446,10 @@ public sealed class PlaybackController : INotifyPropertyChanged
         }
         _tickCount += 1;
         if (_tickCount % 5 == 0 && Audio.IsPlaying)
+        {
             _progress.Save(id, Audio.Position, Audio.Duration, needsSync: false);
+            Audio.RefreshNowPlaying(); // Keeps the Windows media overlay's progress bar moving.
+        }
         var interval = IsInForeground ? ForegroundSyncSeconds : BackgroundSyncSeconds;
         if (_tickCount % interval == 0 && Audio.IsPlaying) SyncNow();
         Notify();

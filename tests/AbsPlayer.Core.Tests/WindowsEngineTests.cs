@@ -108,6 +108,24 @@ public class WindowsEngineTests : IDisposable
     }
 
     [Fact]
+    public async Task Speed_carries_over_into_the_next_file()
+    {
+        var (engine, _) = SmtcNowPlaying.Create();
+        using var _e = engine;
+        engine.Volume = 0;
+        engine.Rate = 2;
+        engine.Open(_files, 0, 2.0); // One second of file 1 left at 1x; half that at 2x.
+        engine.Play();
+        await WaitFor(() => engine.CurrentIndex == 1 && engine.LocalPosition > 0.2, "into file 2");
+        var start = engine.LocalPosition;
+        var sw = Stopwatch.StartNew();
+        await Task.Delay(800);
+        var rate = (engine.LocalPosition - start) / sw.Elapsed.TotalSeconds;
+        Assert.InRange(rate, 1.6, 2.4);
+        engine.Close();
+    }
+
+    [Fact]
     public async Task Missing_file_reports_failure()
     {
         var (engine, _) = SmtcNowPlaying.Create();

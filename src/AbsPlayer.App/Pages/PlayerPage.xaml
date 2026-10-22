@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:AbsPlayer.App.Pages"
     xmlns:models="using:AbsPlayer.Core.Models">
-    <Grid x:Name="Layout">
+    <Grid x:Name="Layout" SizeChanged="OnLayoutSizeChanged">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition x:Name="PanelColumn" Width="380" />

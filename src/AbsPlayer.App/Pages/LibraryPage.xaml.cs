@@ -13,6 +13,7 @@ public sealed partial class LibraryPage : Page
     private readonly ObservableCollection<object> _tiles = [];
     private bool _seriesMode;
     private bool _hideFinished;
+    private int _shownThisFetch;
     private static LibraryModel Model => Services.Library;
 
     public LibraryPage()
@@ -24,6 +25,7 @@ public sealed partial class LibraryPage : Page
         Model.Items.CollectionChanged += OnItemsChanged;
         Model.Series.CollectionChanged += OnSeriesChanged;
         RefreshHeader();
+        RefreshContinue();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -43,12 +45,31 @@ public sealed partial class LibraryPage : Page
         {
             case nameof(LibraryModel.Progress):
                 foreach (var t in _tiles.OfType<BookVm>()) t.Refresh();
+                RefreshContinue();
+                break;
+            case nameof(LibraryModel.ContinueItems):
+                RefreshContinue();
                 break;
             case nameof(LibraryModel.Selected) when _seriesMode:
                 _ = Model.LoadSeries();
                 break;
+            case nameof(LibraryModel.Loading) when Model.Loading:
+                _shownThisFetch = 0;
+                break;
+            case nameof(LibraryModel.Loading):
+                // With "Hide finished" on, a whole page can be finished books: nothing new appears,
+                // so scrolling would never ask for more. Keep going until something shows.
+                if (!_seriesMode && Model.HasMore && (_shownThisFetch == 0 || _tiles.Count < 24)) _ = Model.LoadMore();
+                break;
         }
         RefreshHeader();
+    }
+
+    /// <summary>Rebuilt only when it changes, so it doesn't flicker or lose its scroll position.</summary>
+    private void RefreshContinue()
+    {
+        ContinueList.ItemsSource = BookVm.From(Model.ContinueItems);
+        ContinueSection.Visibility = Ui.Show(Model.ContinueItems.Count > 0);
     }
 
     private void RefreshHeader()
@@ -57,8 +78,6 @@ public sealed partial class LibraryPage : Page
         ErrorText.Visibility = Ui.Show(Model.Error is not null);
         LibraryName.Text = Model.Selected?.Name ?? "Library";
         LoadingRing.IsActive = Model.Loading;
-        ContinueList.ItemsSource = BookVm.From(Model.ContinueItems);
-        ContinueSection.Visibility = Ui.Show(Model.ContinueItems.Count > 0);
     }
 
     private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -67,7 +86,10 @@ public sealed partial class LibraryPage : Page
         if (e.Action == NotifyCollectionChangedAction.Reset) { _tiles.Clear(); return; }
         foreach (var item in e.NewItems?.OfType<LibraryItem>() ?? [])
             if (!_hideFinished || (Model.ProgressFor(item.Id) ?? 0) < 1)
+            {
                 _tiles.Add(new BookVm(item, Model.ProgressFor(item.Id)));
+                _shownThisFetch++;
+            }
     }
 
     private void OnSeriesChanged(object? sender, NotifyCollectionChangedEventArgs e)

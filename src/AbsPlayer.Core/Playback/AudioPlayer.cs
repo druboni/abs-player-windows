@@ -220,7 +220,7 @@ public sealed class AudioPlayer
         _nowPlaying.SetArtwork(url);
     }
 
-    private void RefreshNowPlaying()
+    public void RefreshNowPlaying()
     {
         if (!_loaded) return;
         _nowPlaying.SetState(IsPlaying, Position, Duration, Speed);

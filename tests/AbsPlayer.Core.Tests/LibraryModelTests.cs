@@ -18,11 +18,11 @@ public class LibraryModelTests
             var path = req.RequestUri!.AbsolutePath;
             var query = System.Web.HttpUtility.ParseQueryString(req.RequestUri.Query);
             if (path.EndsWith("/api/libraries"))
-                return StubHandler.Json("""{"libraries":[{"id":"lib1","name":"Books","icon":"database"},{"id":"lib2","name":"Pods","icon":"podcast"}]}""");
+                return StubHandler.Json("""{"libraries":[{"id":"lib1","name":"Books","icon":"database","mediaType":"book"},{"id":"pods","name":"Pods","icon":"podcast","mediaType":"podcast"},{"id":"lib2","name":"More Books","mediaType":"book"}]}""");
             if (path.EndsWith("/api/me"))
                 return StubHandler.Json("""{"mediaProgress":[{"libraryItemId":"i1","progress":1,"isFinished":true},{"libraryItemId":"i2","progress":0.4,"isFinished":false}]}""");
             if (path.EndsWith("/items-in-progress"))
-                return StubHandler.Json($$"""{"libraryItems":[{{Item("i1")}},{{Item("i2")}}]}""");
+                return StubHandler.Json("{\"libraryItems\":[" + Item("i1") + "," + Item("i2") + ",{\"id\":\"ep\",\"mediaType\":\"podcast\",\"media\":{\"metadata\":{\"title\":\"Pod\"}}}]}");
             if (path.EndsWith("/lib1/items"))
             {
                 var page = int.Parse(query["page"]!);
@@ -45,10 +45,10 @@ public class LibraryModelTests
         using var _e = env;
         await model.Load();
 
-        Assert.Equal(["Books", "Pods"], model.Libraries.Select(l => l.Name));
+        Assert.Equal(["Books", "More Books"], model.Libraries.Select(l => l.Name)); // Podcast library left out.
         Assert.Equal("lib1", model.Selected!.Id);
         Assert.Equal(50, model.Items.Count);
-        Assert.Equal(["i2"], model.ContinueItems.Select(i => i.Id));
+        Assert.Equal(["i2"], model.ContinueItems.Select(i => i.Id)); // Finished book and podcast episode left out.
         Assert.Equal(0.4, model.ProgressFor("i2"));
         Assert.Null(model.ProgressFor("nope"));
         Assert.False(model.Loading);
@@ -119,6 +119,40 @@ public class LibraryModelTests
         await model.LoadSeries();
         Assert.Single(model.Series);
         Assert.Single(env.Handler.Requests, r => r.Request.RequestUri!.AbsolutePath.EndsWith("/series"));
+    }
+
+    [Fact]
+    public async Task Overlapping_series_loads_fetch_each_page_once()
+    {
+        var (env, model, _) = Setup();
+        using var _e = env;
+        await model.Load();
+        await Task.WhenAll(Enumerable.Range(0, 5).Select(_ => model.LoadSeries()));
+        Assert.Single(model.Series);
+        Assert.Single(env.Handler.Requests, r => r.Request.RequestUri!.AbsolutePath.EndsWith("/series"));
+    }
+
+    [Fact]
+    public async Task A_broken_item_doesnt_break_the_page()
+    {
+        var (env, model, _) = Setup((req) => Task.FromResult(req.RequestUri!.AbsolutePath.EndsWith("/lib1/items")
+            ? StubHandler.Json("{\"results\":[" + Item("ok1") + ",{\"id\":\"bad\",\"media\":{\"metadata\":{\"title\":null}}}," + Item("ok2") + "],\"total\":3,\"limit\":50,\"page\":0}")
+            : null!));
+        using var _e = env;
+        await model.Load();
+        Assert.Null(model.Error);
+        Assert.Equal(["ok1", "ok2"], model.Items.Select(i => i.Id));
+    }
+
+    [Fact]
+    public async Task Server_with_only_podcasts_says_so()
+    {
+        var (env, model, _) = Setup(req => Task.FromResult(req.RequestUri!.AbsolutePath.EndsWith("/api/libraries")
+            ? StubHandler.Json("""{"libraries":[{"id":"p","name":"Pods","mediaType":"podcast"}]}""") : null!));
+        using var _e = env;
+        await model.Load();
+        Assert.Empty(model.Libraries);
+        Assert.Equal("This server has no audiobook libraries.", model.Error);
     }
 
     [Fact]

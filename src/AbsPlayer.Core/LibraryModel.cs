@@ -38,8 +38,10 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
         Notify(nameof(Loading)); Notify(nameof(Error));
         try
         {
-            Libraries = await repository.GetLibraries();
+            // Only audiobook libraries: podcasts need episode handling this app doesn't have.
+            Libraries = (await repository.GetLibraries()).Where(l => l.IsBooks).ToList();
             Notify(nameof(Libraries));
+            if (Libraries.Count == 0) { Error = "This server has no audiobook libraries."; Notify(nameof(Error)); }
             await RefreshProgress();
             if (Libraries.FirstOrDefault() is { } first) await Select(first);
         }
@@ -55,7 +57,7 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
         try
         {
             var c = await repository.GetContinueListening();
-            ContinueItems = c.Where(i => (ProgressFor(i.Id) ?? 0) < 1).ToList();
+            ContinueItems = c.Where(i => i.MediaType != "podcast" && (ProgressFor(i.Id) ?? 0) < 1).ToList();
             Notify(nameof(ContinueItems));
         }
         catch (ApiException) { }
@@ -83,11 +85,15 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
         Notify(nameof(SearchResults)); Notify(nameof(Searching));
     }
 
+    private bool _seriesLoading;
+
+    /// <summary>Fetches the next page of series. Calls while one is in flight are ignored.</summary>
     public async Task LoadSeries(bool reset = false)
     {
         if (Selected is not { } lib) return;
         if (reset) { Series.Clear(); _seriesPage = 0; _seriesTotal = 0; }
-        if (Series.Count > 0 && Series.Count >= _seriesTotal) return;
+        if (_seriesLoading || (_seriesPage > 0 && Series.Count >= _seriesTotal)) return;
+        _seriesLoading = true;
         try
         {
             var r = await repository.GetSeries(lib.Id, _seriesPage, 50);
@@ -97,13 +103,14 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
             _seriesPage++;
         }
         catch (ApiException) { }
+        finally { _seriesLoading = false; }
     }
 
     public async Task Select(Library lib)
     {
         Selected = lib;
         Items.Clear(); _page = 0; _hasMore = false;
-        Series.Clear(); _seriesPage = 0; _seriesTotal = 0;
+        Series.Clear(); _seriesPage = 0; _seriesTotal = 0; _seriesLoading = false;
         SearchResults = null;
         Notify(nameof(Selected)); Notify(nameof(SearchResults));
         await Fetch();
