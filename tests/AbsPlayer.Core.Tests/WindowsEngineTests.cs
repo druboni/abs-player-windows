@@ -5,8 +5,9 @@ namespace AbsPlayer.Core.Tests;
 
 /// <summary>
 /// The real Windows.Media.Playback engine on generated silent WAV files, at volume 0.
-/// Nothing is audible and no window opens.
+/// Nothing is audible and no window opens. Skipped on CI (Category=Audio), where build machines may lack Media Foundation.
 /// </summary>
+[Trait("Category", "Audio")]
 public class WindowsEngineTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "absplayer-engine", Guid.NewGuid().ToString("N"));

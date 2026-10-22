@@ -49,6 +49,12 @@ $env:ABS_LIVE_TOKEN = "<an Audiobookshelf API key or user token>"
 dotnet test --filter LiveServerTests
 ```
 
+## Continuous build
+`.github/workflows/build.yml` runs the tests and builds the installer on every push and pull request. The real-audio tests are skipped there. Pushing a tag such as `v0.2.0` also attaches the installer to that release.
+
+## License
+[MIT](LICENSE). ABS Player is an independent app and is not affiliated with the Audiobookshelf project.
+
 ## Status
 - [x] Step 1: API client, models, repository, token storage, offline progress
 - [x] Step 2: playback and sync (Windows media player, media keys and overlay)
