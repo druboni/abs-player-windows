@@ -1,4 +1,5 @@
 using AbsPlayer.Core;
+using AbsPlayer.Core.Downloads;
 using AbsPlayer.Core.Playback;
 using AbsPlayer.Core.Requester;
 using AbsPlayer.Core.Storage;
@@ -20,6 +21,7 @@ public static class Services
     public static LibraryModel Library { get; private set; } = null!;
     public static UpdateChecker Updates { get; private set; } = null!;
     public static RequesterClient Requester { get; private set; } = null!;
+    public static DownloadManager Downloads { get; private set; } = null!;
     public static DispatcherQueue Dispatcher { get; private set; } = null!;
 
     public static void Initialize()
@@ -40,11 +42,29 @@ public static class Services
         Http.DefaultRequestHeaders.UserAgent.ParseAdd($"ABSPlayerWindows/{AppConfig.Version}");
         Repository = new AudiobookRepository(User, Http);
         Progress = new LocalProgressStore(Path.Combine(dir, "local_progress.json"));
+        // Big files: no overall time limit (a dropped connection is detected and resumed instead).
+        var downloadHttp = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+        downloadHttp.DefaultRequestHeaders.UserAgent.ParseAdd($"ABSPlayerWindows/{AppConfig.Version}");
+        Downloads = new DownloadManager(Repository, downloadHttp, Prefs, Path.Combine(dir, "Downloads"), IsMetered, dispatch: Dispatch);
+        Repository.LocalCoverResolver = Downloads.LocalCover;
         var (engine, nowPlaying) = SmtcNowPlaying.Create();
         Audio = new AudioPlayer(engine, nowPlaying, Prefs, Settings, Dispatch);
-        Playback = new PlaybackController(Repository, Audio, Progress, Prefs, dispatch: Dispatch);
+        Playback = new PlaybackController(Repository, Audio, Progress, Prefs, offline: Downloads, dispatch: Dispatch);
         Library = new LibraryModel(Repository, Prefs);
-        Updates = new UpdateChecker(Http, Settings, AppConfig.Version);
+        Updates = new UpdateChecker(downloadHttp, Settings, AppConfig.Version);
         Requester = new RequesterClient(Settings, secrets, Http);
+        Downloads.ResumeUnfinished();
+    }
+
+    /// <summary>A phone hotspot or capped plan, where big downloads may cost money.</summary>
+    private static bool IsMetered()
+    {
+        try
+        {
+            var cost = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile()?.GetConnectionCost();
+            return cost is not null && (cost.NetworkCostType is Windows.Networking.Connectivity.NetworkCostType.Fixed
+                or Windows.Networking.Connectivity.NetworkCostType.Variable || cost.Roaming || cost.OverDataLimit);
+        }
+        catch (Exception) { return false; } // Unknown: don't hold downloads back.
     }
 }

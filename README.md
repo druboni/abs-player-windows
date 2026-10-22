@@ -52,6 +52,17 @@ dotnet test --filter LiveServerTests
 ## Continuous build
 `.github/workflows/build.yml` runs the tests and builds the installer on every push and pull request. The real-audio tests are skipped there. Pushing a tag such as `v0.2.0` also attaches the installer to that release.
 
+## Downloads and offline listening
+Click **Download** on a book's page. The book's audio files, chapters and cover are saved in `%LOCALAPPDATA%\ABSPlayer\Downloads`. Downloaded books:
+- show in a **Downloaded** row on the library page;
+- play without a connection;
+- sync your position to the server once you're back online.
+
+If the connection drops or the app closes, downloads resume where they stopped. In **Settings → Downloads** you can:
+- hold downloads while on a metered connection, such as a phone hotspot;
+- remove a book automatically when you finish it;
+- open the downloads folder, or remove all downloads.
+
 ## Audiobook Requester
 If you run [Audiobook Requester](https://github.com/druboni/audiobook-requester), add its address in **Settings → Audiobook Requester** and sign in with your Audiobookshelf username and password. A **Request** button then appears in the top bar, with three tabs:
 - **Search:** search Audible, see what's already in the library, and request books with an optional note.
@@ -84,6 +95,6 @@ The one exception is the update check. Once a day it asks GitHub's public API (`
 ## Status
 - [x] Step 1: API client, models, repository, token storage, offline progress
 - [x] Step 2: playback and sync (Windows media player, media keys and overlay)
-- [ ] Step 3: screens (sign-in, library, book detail, player, settings) — built, not yet tried on screen
-- [ ] Step 4: downloads and offline playback
+- [x] Step 3: screens (sign-in, library, book detail, player, settings)
+- [x] Step 4: downloads and offline listening
 - [x] Step 5: installer (Inno Setup, per-user)

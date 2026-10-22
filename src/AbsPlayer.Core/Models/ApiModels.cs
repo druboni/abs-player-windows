@@ -124,7 +124,11 @@ public sealed class Metadata
     public sealed record SeriesRef(string? Sequence);
 }
 
-public sealed record AudioTrack(int Index, double StartOffset, double Duration, string? Title, string? ContentUrl);
+public sealed record AudioTrack(int Index, double StartOffset, double Duration, string? Title, string? ContentUrl,
+    string? MimeType = null, TrackFile? Metadata = null);
+
+/// <summary>The audio file behind a track: its name, extension (".m4b") and size in bytes.</summary>
+public sealed record TrackFile(string? Filename, string? Ext, long? Size);
 
 public sealed record Chapter(int Id, double Start, double End, string Title);
 

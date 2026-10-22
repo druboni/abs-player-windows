@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using AbsPlayer.Core;
 using AbsPlayer.Core.Api;
+using AbsPlayer.Core.Downloads;
 using AbsPlayer.Core.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -42,6 +43,7 @@ public sealed partial class BookDetailPage : Page
     {
         _item = (LibraryItem)e.Parameter;
         Services.Playback.PropertyChanged += OnPlaybackChanged;
+        Services.Downloads.Changed += OnDownloadChanged;
         Cover.Source = Ui.Image(Services.Repository.CoverUrl(_item.Id), 600);
         Render();
         try { _full ??= await Services.Repository.GetItem(_item.Id); }
@@ -51,7 +53,71 @@ public sealed partial class BookDetailPage : Page
         Render();
     }
 
-    protected override void OnNavigatedFrom(NavigationEventArgs e) => Services.Playback.PropertyChanged -= OnPlaybackChanged;
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        Services.Playback.PropertyChanged -= OnPlaybackChanged;
+        Services.Downloads.Changed -= OnDownloadChanged;
+    }
+
+    // Downloads
+
+    private void OnDownloadChanged(object? sender, string itemId)
+    {
+        if (itemId == _item.Id) RenderDownload();
+    }
+
+    /// <summary>The book's total size: from the server, or added up from its files.</summary>
+    private long? Size
+    {
+        get
+        {
+            var item = _full ?? _item;
+            if (item.Size is > 0) return item.Size;
+            var sizes = item.Media.Tracks?.Select(t => t.Metadata?.Size ?? 0).ToList();
+            return sizes is { Count: > 0 } && sizes.All(s => s > 0) ? sizes.Sum() : null;
+        }
+    }
+
+    private void RenderDownload()
+    {
+        var status = Services.Downloads.Status(_item.Id);
+        DownloadButton.Visibility = Ui.Show(status.Kind == DownloadKind.None);
+        DownloadingPanel.Visibility = Ui.Show(status.Kind is DownloadKind.Queued or DownloadKind.Downloading or DownloadKind.WaitingForUnmetered);
+        DownloadedPanel.Visibility = Ui.Show(status.Kind == DownloadKind.Downloaded);
+        FailedPanel.Visibility = Ui.Show(status.Kind == DownloadKind.Failed);
+        DownloadText.Text = Size is { } size ? $"Download ({Format.Bytes(size)})" : "Download";
+        DownloadProgress.Value = status.Progress;
+        DownloadProgress.IsIndeterminate = status.Kind == DownloadKind.Queued;
+        DownloadStatusText.Text = status.Kind switch
+        {
+            DownloadKind.Queued => "Starting download…",
+            DownloadKind.WaitingForUnmetered => "Waiting for a connection that isn't metered",
+            _ => $"Downloading {(int)(status.Progress * 100)}%" + (status.SecondsLeft is { } left ? $" · {Format.Estimate(left)} left" : ""),
+        };
+        DownloadedText.Text = Services.Downloads.Manifest(_item.Id) is { } m ? $"Downloaded ({Format.Bytes(m.SizeBytes)})" : "Downloaded";
+        FailedText.Text = $"Download failed: {status.Message}";
+    }
+
+    private async void OnDownload(object sender, RoutedEventArgs e)
+    {
+        // Leave half a gigabyte spare so the PC isn't left with a full disk.
+        if (Size is { } size && Services.Downloads.FreeSpace is { } free && size > free - 500_000_000)
+        {
+            await new ContentDialog
+            {
+                XamlRoot = XamlRoot,
+                Title = "Not enough space",
+                Content = $"This book needs {Format.Bytes(size)}, but only {Format.Bytes(Math.Max(free, 0))} is free on that drive.",
+                CloseButtonText = "OK",
+            }.ShowAsync();
+            return;
+        }
+        Services.Downloads.Download(_item.Id);
+    }
+
+    private void OnCancelDownload(object sender, RoutedEventArgs e) => Services.Downloads.Cancel(_item.Id);
+    private void OnRemoveDownload(object sender, RoutedEventArgs e) => Services.Downloads.Remove(_item.Id);
+    private void OnRetryDownload(object sender, RoutedEventArgs e) => Services.Downloads.Retry(_item.Id);
 
     private void OnPlaybackChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -70,6 +136,7 @@ public sealed partial class BookDetailPage : Page
         ChaptersExpander.Visibility = Ui.Show(Chapters.Count > 0);
         ChapterCount.Text = $"{Chapters.Count}";
         UpdatePlayButton();
+        RenderDownload();
         _shownChapter = -2;
         UpdateChapters();
     }

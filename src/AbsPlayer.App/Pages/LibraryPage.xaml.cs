@@ -24,6 +24,8 @@ public sealed partial class LibraryPage : Page
         Model.PropertyChanged += (_, e) => OnModelChanged(e.PropertyName);
         Model.Items.CollectionChanged += OnItemsChanged;
         Model.Series.CollectionChanged += OnSeriesChanged;
+        Services.Downloads.Changed += OnDownloadChanged;
+        RefreshDownloaded();
         RefreshHeader();
         RefreshContinue();
     }
@@ -63,6 +65,23 @@ public sealed partial class LibraryPage : Page
                 break;
         }
         RefreshHeader();
+    }
+
+    /// <summary>Downloaded books, playable offline. Built from what's on disk, so it shows even when the server can't be reached.</summary>
+    private void RefreshDownloaded()
+    {
+        var books = Services.Downloads.Books;
+        DownloadedList.ItemsSource = BookVm.From(books.Select(b => b.ToLibraryItem()));
+        DownloadedSection.Visibility = Ui.Show(books.Count > 0);
+    }
+
+    private void OnDownloadChanged(object? sender, string itemId)
+    {
+        var downloaded = Services.Downloads.Status(itemId).Kind == Core.Downloads.DownloadKind.Downloaded;
+        var listed = (DownloadedList.ItemsSource as IEnumerable<BookVm>)?.Any(b => b.Item.Id == itemId) ?? false;
+        if (downloaded != listed) RefreshDownloaded();
+        foreach (var t in _tiles.OfType<BookVm>().Where(t => t.Item.Id == itemId)) t.RefreshDownload();
+        foreach (var t in (ContinueList.ItemsSource as IEnumerable<BookVm>) ?? []) if (t.Item.Id == itemId) t.RefreshDownload();
     }
 
     /// <summary>Rebuilt only when it changes, so it doesn't flicker or lose its scroll position.</summary>

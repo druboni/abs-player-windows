@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using AbsPlayer.Core.Downloads;
 using AbsPlayer.Core.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -20,6 +21,7 @@ public sealed class BookVm(LibraryItem item, double? progress, string? seriesNam
     public double Progress => (_progress ?? 0) * 100;
     public Visibility ProgressVisibility => _progress is > 0 and < 1 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility FinishedVisibility => _progress >= 1 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DownloadedVisibility => Ui.Show(Services.Downloads.Status(Item.Id).Kind == DownloadKind.Downloaded);
 
     /// <summary>Picks up the latest progress from the library model.</summary>
     public void Refresh()
@@ -29,6 +31,10 @@ public sealed class BookVm(LibraryItem item, double? progress, string? seriesNam
         _progress = latest;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
     }
+
+    /// <summary>The downloaded badge changed.</summary>
+    public void RefreshDownload() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DownloadedVisibility)));
+
     /// <summary>"Book 3", when shown inside a series.</summary>
     public string SeriesLabel => seriesName is not null && Item.Sequence(seriesName) is { } s ? $"Book {s}" : "";
 
@@ -67,8 +73,23 @@ public sealed partial class TileTemplateSelector : DataTemplateSelector
 public static class Ui
 {
     /// <summary>A cover image decoded at tile size, so long grids stay light on memory.</summary>
-    public static BitmapImage? Image(Uri? uri, int decodeWidth = 320) =>
-        uri is null ? null : new BitmapImage(uri) { DecodePixelWidth = decodeWidth, DecodePixelType = DecodePixelType.Logical };
+    public static BitmapImage? Image(Uri? uri, int decodeWidth = 320)
+    {
+        if (uri is null) return null;
+        var image = new BitmapImage { DecodePixelWidth = decodeWidth, DecodePixelType = DecodePixelType.Logical };
+        if (!uri.IsFile) { image.UriSource = uri; return image; }
+        // A downloaded book's cover on disk.
+        try
+        {
+            using var file = File.OpenRead(uri.LocalPath);
+            var copy = new MemoryStream();
+            file.CopyTo(copy);
+            copy.Position = 0;
+            image.SetSource(copy.AsRandomAccessStream());
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return null; }
+        return image;
+    }
 
     public static Visibility Show(bool visible) => visible ? Visibility.Visible : Visibility.Collapsed;
 }

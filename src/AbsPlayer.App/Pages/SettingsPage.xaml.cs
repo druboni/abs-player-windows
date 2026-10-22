@@ -34,6 +34,9 @@ public sealed partial class SettingsPage : Page
         Fill(Sort, Enum.GetValues<LibrarySort>().Select(s => new Option<LibrarySort>(s.Label(), s)), Prefs.LibrarySort);
         HideFinished.IsOn = Prefs.HideFinished;
         AutoUpdate.IsOn = Services.Updates.Enabled;
+        MeteredOnly.IsOn = Prefs.DownloadOnWiFiOnly;
+        RemoveFinished.IsOn = Prefs.RemoveDownloadWhenFinished;
+        RenderDownloads();
         RequesterUrl.Text = Services.Requester.Url ?? "";
         RenderRequester();
         _loading = false;
@@ -115,6 +118,34 @@ public sealed partial class SettingsPage : Page
         Services.Requester.Disconnect(forgetUrl: true);
         RequesterUrl.Text = "";
         RenderRequester();
+    }
+
+    // Downloads
+
+    private void RenderDownloads()
+    {
+        var count = Services.Downloads.Books.Count;
+        DownloadSummary.Text = count == 0
+            ? "No books downloaded."
+            : $"{count} book{(count == 1 ? "" : "s")} downloaded, using {Format.Bytes(Services.Downloads.TotalBytes)}"
+              + (Services.Downloads.FreeSpace is { } free ? $" ({Format.Bytes(free)} free)." : ".");
+        RemoveAllButton.IsEnabled = count > 0;
+    }
+
+    private void OnMeteredToggled(object sender, RoutedEventArgs e) { if (!_loading) Prefs.DownloadOnWiFiOnly = MeteredOnly.IsOn; }
+    private void OnRemoveFinishedToggled(object sender, RoutedEventArgs e) { if (!_loading) Prefs.RemoveDownloadWhenFinished = RemoveFinished.IsOn; }
+
+    private void OnOpenDownloads(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(Services.Downloads.Root);
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"\"{Services.Downloads.Root}\""));
+    }
+
+    private async void OnRemoveAllDownloads(object sender, RoutedEventArgs e)
+    {
+        if (!await Confirm("Remove all downloaded books?", "They'll stream from the server again.", "Remove All")) return;
+        Services.Downloads.RemoveAll();
+        RenderDownloads();
     }
 
     private void OnAutoUpdateToggled(object sender, RoutedEventArgs e) { if (!_loading) Services.Updates.Enabled = AutoUpdate.IsOn; }

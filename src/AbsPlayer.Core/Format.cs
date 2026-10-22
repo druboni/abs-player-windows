@@ -23,6 +23,27 @@ public static partial class Format
         return $"{t}s";
     }
 
+    /// <summary>"229 MB", "1.4 GB".</summary>
+    public static string Bytes(long bytes)
+    {
+        string[] units = ["bytes", "KB", "MB", "GB", "TB"];
+        double v = bytes;
+        var u = 0;
+        while (v >= 1000 && u < units.Length - 1) { v /= 1000; u++; }
+        return u == 0 ? $"{bytes} bytes" : v.ToString(v < 10 ? "0.#" : "0", CultureInfo.InvariantCulture) + " " + units[u];
+    }
+
+    /// <summary>"under a minute", "about 3 min", "about 1 hr 20 min".</summary>
+    public static string Estimate(double seconds)
+    {
+        var s = Math.Max((int)Math.Round(seconds), 1);
+        if (s < 60) return "under a minute";
+        int h = s / 3600, m = (s % 3600 + 59) / 60;
+        if (m == 60) { h++; m = 0; }
+        if (h == 0) return $"about {m} min";
+        return m == 0 ? $"about {h} hr" : $"about {h} hr {m} min";
+    }
+
     public static string Speed(double s) => s.ToString("0.##", CultureInfo.InvariantCulture) + "x";
 
     public static string StripHtml(string s) => HtmlTag().Replace(s, "");

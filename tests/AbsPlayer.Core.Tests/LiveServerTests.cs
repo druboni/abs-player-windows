@@ -136,6 +136,51 @@ public class LiveServerTests
         Assert.True(sw.ElapsedMilliseconds < 20_000, "stream didn't reach 61.5 s within 20 s");
     }
 
+    /// <summary>
+    /// Downloads a real book (ABS_LIVE_DOWNLOAD_ITEM) to a temp folder and plays it from disk at volume 0,
+    /// across its first file boundary. Read-only on the server. Skipped unless the item is set.
+    /// </summary>
+    [LiveFact]
+    public async Task Downloads_a_real_book_and_plays_it_from_disk()
+    {
+        if (Environment.GetEnvironmentVariable("ABS_LIVE_DOWNLOAD_ITEM") is not { } itemId) return;
+        var (env, repo) = Connect();
+        using var _ = env;
+        var root = Path.Combine(env.Dir, "Downloads");
+        using var http = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+        var downloads = new Downloads.DownloadManager(repo, http, new Prefs(env.Prefs.Settings), root);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        downloads.Download(itemId);
+        while (downloads.Status(itemId).Kind is not (Downloads.DownloadKind.Downloaded or Downloads.DownloadKind.Failed) && sw.Elapsed < TimeSpan.FromMinutes(10))
+            await Task.Delay(250);
+        var status = downloads.Status(itemId);
+        Assert.True(status.Kind == Downloads.DownloadKind.Downloaded, $"{status.Kind}: {status.Message}");
+
+        var item = await repo.GetItem(itemId);
+        var tracks = downloads.LocalTracks(itemId)!;
+        Assert.Equal(item.Media.Tracks!.Count, tracks.Count);
+        Assert.All(tracks, t => Assert.True(File.Exists(t.Url.LocalPath)));
+        Assert.All(tracks, t => Assert.NotEqual("", Path.GetExtension(t.Url.LocalPath)));
+        Assert.Equal(item.Media.Tracks.Sum(t => t.Metadata?.Size ?? 0), downloads.Manifest(itemId)!.SizeBytes);
+        Assert.NotNull(downloads.LocalCover(itemId));
+        Console.WriteLine($"Downloaded {tracks.Count} files, {downloads.TotalBytes / 1e6:0.0} MB in {sw.Elapsed.TotalSeconds:0}s");
+
+        // Play from disk, starting a second before file 1 ends, and check it moves on to file 2.
+        var (engine, __) = Playback.SmtcNowPlaying.Create();
+        using var ___ = engine;
+        string? failure = null;
+        engine.Failed += (_, m) => failure = m;
+        engine.Volume = 0;
+        engine.Open(tracks.Select(t => t.Url).ToList(), 0, Math.Max(tracks[0].Duration - 1, 0));
+        engine.Play();
+        var played = System.Diagnostics.Stopwatch.StartNew();
+        var target = tracks.Count > 1 ? 1 : 0;
+        while ((engine.CurrentIndex < target || engine.LocalPosition < 0.5) && failure is null && played.ElapsedMilliseconds < 15_000) await Task.Delay(100);
+        engine.Close();
+        Assert.Null(failure);
+        Assert.True(played.ElapsedMilliseconds < 15_000, "didn't play across the first file boundary");
+    }
+
     [LiveFact]
     public async Task Bad_token_is_unauthorized()
     {

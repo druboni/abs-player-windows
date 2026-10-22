@@ -114,6 +114,13 @@ public class ModelTests
         Assert.Equal("1.25x", Format.Speed(1.25));
         Assert.Equal("2x", Format.Speed(2));
         Assert.Equal("Hi there", Format.StripHtml("<p>Hi <b>there</b></p>"));
+        Assert.Equal("229 MB", Format.Bytes(229_290_413));
+        Assert.Equal("1.4 GB", Format.Bytes(1_400_000_000));
+        Assert.Equal("512 bytes", Format.Bytes(512));
+        Assert.Equal("under a minute", Format.Estimate(20));
+        Assert.Equal("about 3 min", Format.Estimate(150));
+        Assert.Equal("about 1 hr 20 min", Format.Estimate(4790));
+        Assert.Equal("about 2 hr", Format.Estimate(7190));
 
         var chapters = new List<Chapter> { new(0, 0, 100, "Intro"), new(1, 100, 200, "Middle"), new(2, 200, 300, "End") };
         var p = new MediaProgressResponse { LibraryItemId = "a", CurrentTime = 150, Progress = 0.5 };

@@ -60,6 +60,19 @@
                 <ToggleSwitch x:Name="HideFinished" Header="Hide finished books" Toggled="OnHideFinishedToggled" />
             </StackPanel>
 
+            <TextBlock Text="Downloads" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
+                <TextBlock x:Name="DownloadSummary" />
+                <ToggleSwitch x:Name="MeteredOnly" Header="Don't download on metered connections" Toggled="OnMeteredToggled" />
+                <ToggleSwitch x:Name="RemoveFinished" Header="Remove a download when I finish the book" Toggled="OnRemoveFinishedToggled" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="Open Downloads Folder" Click="OnOpenDownloads" />
+                    <Button x:Name="RemoveAllButton" Content="Remove All Downloads" Click="OnRemoveAllDownloads" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap"
+                           Text="Downloaded books play without a connection, and your position syncs when you're back online. Metered connections are things like phone hotspots and capped plans; with the switch on, downloads wait until you're on another network." />
+            </StackPanel>
+
             <TextBlock Text="Updates" Style="{StaticResource SectionHeader}" />
             <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
                 <ToggleSwitch x:Name="AutoUpdate" Header="Check for updates automatically" Toggled="OnAutoUpdateToggled" />

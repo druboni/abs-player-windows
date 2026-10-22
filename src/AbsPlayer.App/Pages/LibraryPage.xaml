@@ -11,10 +11,30 @@
                 <StackPanel Spacing="4" Padding="0,8,0,8">
                     <TextBlock x:Name="ErrorText" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
+                    <StackPanel x:Name="DownloadedSection" Visibility="Collapsed">
+                        <TextBlock Text="Downloaded" Style="{StaticResource SectionHeader}" />
+                        <ListView x:Name="DownloadedList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnTileClick"
+                                  ItemTemplate="{StaticResource BookTile}" Height="250"
+                                  ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,0,12,0" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                    </StackPanel>
+
                     <StackPanel x:Name="ContinueSection" Visibility="Collapsed">
                         <TextBlock Text="Continue Listening" Style="{StaticResource SectionHeader}" />
                         <ListView x:Name="ContinueList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnTileClick"
-                                  ItemTemplate="{StaticResource BookTile}" Height="236"
+                                  ItemTemplate="{StaticResource BookTile}" Height="250"
                                   ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                   ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                             <ListView.ItemsPanel>

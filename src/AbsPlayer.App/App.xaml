@@ -40,6 +40,10 @@
                         <FontIcon Glyph="&#xE7F6;" FontSize="40" Opacity="0.25" />
                         <Image Source="{Binding Cover, Converter={StaticResource Cover}}" Stretch="UniformToFill" />
                         <ProgressBar VerticalAlignment="Bottom" Value="{Binding Progress}" Visibility="{Binding ProgressVisibility}" MinHeight="4" CornerRadius="0" />
+                        <Border Visibility="{Binding DownloadedVisibility}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6"
+                                CornerRadius="11" Width="22" Height="22" Background="#CC000000" ToolTipService.ToolTip="Downloaded">
+                            <FontIcon Glyph="&#xE896;" FontSize="12" Foreground="White" />
+                        </Border>
                         <Border Visibility="{Binding FinishedVisibility}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="6"
                                 CornerRadius="11" Width="22" Height="22" Background="{ThemeResource AccentFillColorDefaultBrush}">
                             <FontIcon Glyph="&#xE73E;" FontSize="12" Foreground="White" />

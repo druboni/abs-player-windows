@@ -24,6 +24,32 @@
             </Button>
             <TextBlock x:Name="ErrorText" Foreground="{ThemeResource SystemFillColorCriticalBrush}" HorizontalAlignment="Center" TextWrapping="Wrap" Visibility="Collapsed" />
 
+            <!-- Download for offline listening -->
+            <Grid HorizontalAlignment="Center">
+                <Button x:Name="DownloadButton" Click="OnDownload" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE896;" FontSize="14" />
+                        <TextBlock x:Name="DownloadText" Text="Download" />
+                    </StackPanel>
+                </Button>
+                <StackPanel x:Name="DownloadingPanel" Spacing="4" Visibility="Collapsed">
+                    <ProgressBar x:Name="DownloadProgress" Width="260" Maximum="1" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                        <TextBlock x:Name="DownloadStatusText" Style="{StaticResource Secondary}" FontSize="13" VerticalAlignment="Center" />
+                        <HyperlinkButton Content="Cancel" Click="OnCancelDownload" Padding="4,0" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel x:Name="DownloadedPanel" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
+                    <FontIcon Glyph="&#xE73E;" Foreground="{ThemeResource SystemFillColorSuccessBrush}" FontSize="14" />
+                    <TextBlock x:Name="DownloadedText" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                    <HyperlinkButton Content="Remove" Click="OnRemoveDownload" Padding="4,0" />
+                </StackPanel>
+                <StackPanel x:Name="FailedPanel" Spacing="2" Visibility="Collapsed" MaxWidth="420">
+                    <TextBlock x:Name="FailedText" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" TextAlignment="Center" />
+                    <HyperlinkButton Content="Try Again" Click="OnRetryDownload" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
             <Expander x:Name="ChaptersExpander" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,8,0,0" Visibility="Collapsed">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal" Spacing="8">

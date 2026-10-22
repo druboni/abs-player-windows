@@ -29,6 +29,11 @@ public sealed partial class MainWindow : Window
             if (Services.User.IsLoggedIn) SignOut(forgetServer: false);
         });
 
+        // Back online: send positions saved while offline.
+        Windows.Networking.Connectivity.NetworkInformation.NetworkStatusChanged += _ => Services.Dispatcher.TryEnqueue(() =>
+        {
+            if (Services.User.IsLoggedIn) _ = Services.Progress.Flush(Services.Repository);
+        });
         Services.Requester.Changed += (_, _) => Services.Dispatcher.TryEnqueue(UpdateRequestButton);
         Services.Requester.SignedOut += (_, _) => Services.Dispatcher.TryEnqueue(UpdateRequestButton);
         UpdateRequestButton();
