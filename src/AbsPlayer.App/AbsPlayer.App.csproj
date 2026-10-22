@@ -13,10 +13,12 @@
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <!-- Needed even unpackaged: without it, publish leaves out ABSPlayer.pri (the compiled XAML) and the app dies on launch. -->
+    <EnableMsixTooling>true</EnableMsixTooling>
     <SelfContained>true</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <Product>ABS Player</Product>
     <Company>druboni</Company>

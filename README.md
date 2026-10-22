@@ -64,7 +64,9 @@ Every signed release is built from this repository by GitHub Actions (`.github/w
 - Approvers: [druboni](https://github.com/druboni)
 
 ## Privacy
-This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. The only system it contacts is the Audiobookshelf server you sign in to; there is no analytics, tracking or telemetry.
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. It contacts the Audiobookshelf server you sign in to. There is no analytics, tracking or telemetry.
+
+The one exception is the update check. Once a day it asks GitHub's public API (`api.github.com`) for the latest release of this app, and it downloads the installer from GitHub when you choose **Download and install**. These requests carry no account, library or listening data. Turn the check off in **Settings → Updates**.
 
 ## License
 [MIT](LICENSE). ABS Player is an independent app and is not affiliated with the Audiobookshelf project.

@@ -47,6 +47,18 @@
                 <ToggleSwitch x:Name="HideFinished" Header="Hide finished books" Toggled="OnHideFinishedToggled" />
             </StackPanel>
 
+            <TextBlock Text="Updates" Style="{StaticResource SectionHeader}" />
+            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
+                <ToggleSwitch x:Name="AutoUpdate" Header="Check for updates automatically" Toggled="OnAutoUpdateToggled" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button x:Name="CheckNowButton" Content="Check Now" Click="OnCheckNow" />
+                    <ProgressRing x:Name="CheckingRing" Width="20" Height="20" IsActive="False" />
+                    <TextBlock x:Name="UpdateStatus" VerticalAlignment="Center" Style="{StaticResource Secondary}" FontSize="14" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap"
+                           Text="Once a day, the app asks GitHub for the newest release of ABS Player. Nothing about you or your library is sent." />
+            </StackPanel>
+
             <TextBlock Text="Keyboard shortcuts" Style="{StaticResource SectionHeader}" />
             <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" RowSpacing="6" ColumnSpacing="24">
                 <Grid.ColumnDefinitions>

@@ -12,6 +12,7 @@
     <Grid x:Name="Root">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -55,8 +56,21 @@
             </Button>
         </Grid>
 
-        <Frame x:Name="ContentFrame" Grid.Row="1" Navigated="OnNavigated" />
+        <!-- Shown when a newer release is on GitHub. -->
+        <InfoBar x:Name="UpdateBar" Grid.Row="1" Margin="12,0,12,8" Severity="Informational" IsOpen="False" Title="Update available">
+            <InfoBar.ActionButton>
+                <Button x:Name="UpdateButton" Content="Download and install" Click="OnInstallUpdate" Style="{StaticResource AccentButtonStyle}" />
+            </InfoBar.ActionButton>
+            <InfoBar.Content>
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+                    <HyperlinkButton x:Name="ReleaseNotesLink" Content="Release notes" Padding="0" />
+                    <ProgressBar x:Name="UpdateProgress" Width="200" Maximum="1" Visibility="Collapsed" VerticalAlignment="Center" />
+                </StackPanel>
+            </InfoBar.Content>
+        </InfoBar>
 
-        <local:NowPlayingBar x:Name="NowPlaying" Grid.Row="2" Visibility="Collapsed" />
+        <Frame x:Name="ContentFrame" Grid.Row="2" Navigated="OnNavigated" />
+
+        <local:NowPlayingBar x:Name="NowPlaying" Grid.Row="3" Visibility="Collapsed" />
     </Grid>
 </Window>

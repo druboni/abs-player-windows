@@ -1,4 +1,5 @@
 using AbsPlayer.App.Pages;
+using AbsPlayer.Core;
 using AbsPlayer.Core.Models;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -30,6 +31,62 @@ public sealed partial class MainWindow : Window
 
         if (Services.User.IsLoggedIn) ShowLibrary();
         else ShowLogin();
+        _ = CheckForUpdatesSoon();
+    }
+
+    // Updates
+
+    private AvailableUpdate? _update;
+
+    /// <summary>The once-a-day check, a few seconds after start so it doesn't compete with loading the library.</summary>
+    private async Task CheckForUpdatesSoon()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        if (await Services.Updates.CheckIfDue() is { } update) ShowUpdate(update);
+    }
+
+    public void ShowUpdate(AvailableUpdate update)
+    {
+        _update = update;
+        UpdateBar.Severity = InfoBarSeverity.Informational;
+        UpdateBar.Title = "Update available";
+        UpdateBar.Message = $"ABS Player {update.Version} is available. You have {AppConfig.Version}.";
+        ReleaseNotesLink.NavigateUri = update.ReleasePage;
+        UpdateButton.IsEnabled = true;
+        UpdateProgress.Visibility = Visibility.Collapsed;
+        UpdateBar.IsOpen = true;
+    }
+
+    /// <summary>Downloads the installer, saves the listening position, then hands over to the installer, which reopens the app.</summary>
+    private async void OnInstallUpdate(object sender, RoutedEventArgs e)
+    {
+        if (_update is not { } update) return;
+        UpdateButton.IsEnabled = false;
+        UpdateBar.IsClosable = false;
+        UpdateBar.Message = $"Downloading ABS Player {update.Version}…";
+        UpdateProgress.Value = 0;
+        UpdateProgress.Visibility = Visibility.Visible;
+        try
+        {
+            var installer = await Services.Updates.Download(update, new Progress<double>(p => UpdateProgress.Value = p));
+            UpdateBar.Message = "Installing… ABS Player will reopen when it's done.";
+            await Task.WhenAny(Services.Playback.Stop(), Task.Delay(TimeSpan.FromSeconds(5)));
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(installer, "/SILENT /SUPPRESSMSGBOXES /NORESTART")
+            {
+                UseShellExecute = true,
+            });
+            _closing = true;
+            Close();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or InvalidDataException or System.ComponentModel.Win32Exception)
+        {
+            UpdateBar.Severity = InfoBarSeverity.Error;
+            UpdateBar.Title = "Update failed";
+            UpdateBar.Message = ex.Message;
+            UpdateButton.IsEnabled = true;
+            UpdateBar.IsClosable = true;
+            UpdateProgress.Visibility = Visibility.Collapsed;
+        }
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]

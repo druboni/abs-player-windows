@@ -33,6 +33,7 @@ public sealed partial class SettingsPage : Page
         Fill(Speed, AudioPlayer.Speeds.Select(s => new Option<double>(Format.Speed(s), s)), Services.Audio.Speed);
         Fill(Sort, Enum.GetValues<LibrarySort>().Select(s => new Option<LibrarySort>(s.Label(), s)), Prefs.LibrarySort);
         HideFinished.IsOn = Prefs.HideFinished;
+        AutoUpdate.IsOn = Services.Updates.Enabled;
         _loading = false;
 
         if (Services.User.ServerUrl is { } server)
@@ -53,6 +54,33 @@ public sealed partial class SettingsPage : Page
     private void OnRewindChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Prefs.RewindOnResume = Picked<int>(Rewind); }
     private void OnSpeedChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Services.Audio.SetSpeed(Picked<double>(Speed)); }
     private void OnHideFinishedToggled(object sender, RoutedEventArgs e) { if (!_loading) Prefs.HideFinished = HideFinished.IsOn; }
+
+    private void OnAutoUpdateToggled(object sender, RoutedEventArgs e) { if (!_loading) Services.Updates.Enabled = AutoUpdate.IsOn; }
+
+    private async void OnCheckNow(object sender, RoutedEventArgs e)
+    {
+        CheckNowButton.IsEnabled = false;
+        CheckingRing.IsActive = true;
+        UpdateStatus.Text = "";
+        try
+        {
+            if (await Services.Updates.Check() is { } update)
+            {
+                UpdateStatus.Text = $"Version {update.Version} is available.";
+                App.Window.ShowUpdate(update);
+            }
+            else
+            {
+                UpdateStatus.Text = $"You have the latest version ({AppConfig.Version}).";
+            }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        {
+            UpdateStatus.Text = "Couldn't reach GitHub. Try again later.";
+        }
+        CheckingRing.IsActive = false;
+        CheckNowButton.IsEnabled = true;
+    }
 
     private async void OnSortChanged(object sender, SelectionChangedEventArgs e)
     {

@@ -50,6 +50,14 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExe}"; Tasks: deskto
 
 [Run]
 Filename: "{app}\{#MyAppExe}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
+; The app's own updater runs setup with /SILENT; reopen the app afterwards (not when /NOLAUNCH=1 is passed).
+Filename: "{app}\{#MyAppExe}"; Flags: nowait; Check: RelaunchAfterSilentInstall
 
 ; Settings, saved positions and the sign-in token (in Credential Manager) are kept on uninstall,
 ; so reinstalling picks up where you left off.
+
+[Code]
+function RelaunchAfterSilentInstall: Boolean;
+begin
+  Result := WizardSilent and (ExpandConstant('{param:NOLAUNCH|0}') = '0');
+end;

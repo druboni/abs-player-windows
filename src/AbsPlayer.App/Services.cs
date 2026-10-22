@@ -17,6 +17,7 @@ public static class Services
     public static AudioPlayer Audio { get; private set; } = null!;
     public static PlaybackController Playback { get; private set; } = null!;
     public static LibraryModel Library { get; private set; } = null!;
+    public static UpdateChecker Updates { get; private set; } = null!;
     public static DispatcherQueue Dispatcher { get; private set; } = null!;
 
     public static void Initialize()
@@ -40,5 +41,6 @@ public static class Services
         Audio = new AudioPlayer(engine, nowPlaying, Prefs, Settings, Dispatch);
         Playback = new PlaybackController(Repository, Audio, Progress, Prefs, dispatch: Dispatch);
         Library = new LibraryModel(Repository, Prefs);
+        Updates = new UpdateChecker(Http, Settings, AppConfig.Version);
     }
 }
