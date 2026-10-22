@@ -52,6 +52,20 @@ dotnet test --filter LiveServerTests
 ## Continuous build
 `.github/workflows/build.yml` runs the tests and builds the installer on every push and pull request. The real-audio tests are skipped there. Pushing a tag such as `v0.2.0` also attaches the installer to that release.
 
+## Download
+Installers are on the [Releases page](https://github.com/druboni/abs-player-windows/releases). Uninstall from Windows Settings → Apps.
+
+## Code signing policy
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+Every signed release is built from this repository by GitHub Actions (`.github/workflows/build.yml`) and approved by hand before it is signed.
+
+- Committers and reviewers: [druboni](https://github.com/druboni)
+- Approvers: [druboni](https://github.com/druboni)
+
+## Privacy
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. The only system it contacts is the Audiobookshelf server you sign in to; there is no analytics, tracking or telemetry.
+
 ## License
 [MIT](LICENSE). ABS Player is an independent app and is not affiliated with the Audiobookshelf project.
 
