@@ -178,16 +178,38 @@ public sealed partial class RequestsPage : Page
         var mine = _lastQuery;
         Searching.IsActive = true;
         SearchEmpty.Text = "";
+        IsbnNote.Visibility = Visibility.Collapsed;
         Results.ItemsSource = null;
         try
         {
+            // Requester searches an ISBN as the book it belongs to; ask which book that is, to say so.
+            var isbn = IsbnLookup.Parse(mine);
+            var lookup = isbn is null ? Task.FromResult<IsbnInfo?>(null) : LookupQuietly(isbn);
             var books = await Requester.Search(mine);
+            var info = await lookup;
             if (mine != _lastQuery) return; // A newer search started.
             Results.ItemsSource = books.Select(b => new ResultRow(b)).ToList();
-            if (books.Count == 0) SearchEmpty.Text = $"Nothing found on Audible for “{mine}”.";
+            if (info is not null)
+            {
+                IsbnNote.Text = $"ISBN {info.Isbn} is {info.Description}. Results on Audible:";
+                IsbnNote.Visibility = Visibility.Visible;
+                Results.Margin = new Thickness(0, 28, 0, 0);
+            }
+            else Results.Margin = new Thickness(0);
+            if (books.Count == 0)
+                SearchEmpty.Text = isbn is not null && info is null
+                    ? $"No book found for ISBN {isbn}. Check the number, or search by title. The ISBN printed on a paper book works best; audiobook editions' own ISBNs often aren't listed."
+                    : $"Nothing found on Audible for “{mine}”.";
         }
         catch (RequesterException ex) { SearchEmpty.Text = ex.Message; }
         finally { Searching.IsActive = false; }
+    }
+
+    /// <summary>Older Requester servers don't have /isbn: then there's just no note.</summary>
+    private static async Task<IsbnInfo?> LookupQuietly(string isbn)
+    {
+        try { return await Requester.LookupIsbn(isbn); }
+        catch (RequesterException) { return null; }
     }
 
     private async void OnRequestClick(object sender, RoutedEventArgs e)

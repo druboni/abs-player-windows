@@ -101,6 +101,13 @@ public sealed class RequesterClient(SettingsStore settings, ISecretStore secrets
     public async Task<List<RequesterBook>> Search(string query) =>
         query.Trim().Length < 2 ? [] : await Send<List<RequesterBook>>(HttpMethod.Get, Api($"search?q={Uri.EscapeDataString(query.Trim())}"));
 
+    /// <summary>What an ISBN is (Requester looks it up on Open Library), or null when nobody knows it.</summary>
+    public async Task<IsbnInfo?> LookupIsbn(string isbn)
+    {
+        try { return await Send<IsbnInfo>(HttpMethod.Get, Api($"isbn/{Uri.EscapeDataString(isbn)}")); }
+        catch (RequesterException e) when (e.Status is 404 or 400) { return null; }
+    }
+
     /// <summary>The caller's own requests, newest first (admins: everyone's when <paramref name="everyone"/>).</summary>
     public Task<List<BookRequest>> Requests(string filter = "all", bool everyone = false) =>
         Send<List<BookRequest>>(HttpMethod.Get, Api($"requests?filter={Uri.EscapeDataString(filter)}{(everyone ? "" : "&mine=1")}"));

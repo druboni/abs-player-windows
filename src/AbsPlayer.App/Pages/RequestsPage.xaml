@@ -97,8 +97,9 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <AutoSuggestBox x:Name="QueryBox" PlaceholderText="Search Audible by title, author or narrator" QueryIcon="Find" MaxWidth="600" HorizontalAlignment="Stretch"
+            <AutoSuggestBox x:Name="QueryBox" PlaceholderText="Search Audible by title, author, narrator or ISBN" QueryIcon="Find" MaxWidth="600" HorizontalAlignment="Stretch"
                             QuerySubmitted="OnQuerySubmitted" />
+            <TextBlock x:Name="IsbnNote" Grid.Row="1" Style="{StaticResource Secondary}" FontSize="14" TextWrapping="Wrap" Visibility="Collapsed" Margin="0,0,0,8" VerticalAlignment="Top" />
             <ListView x:Name="Results" Grid.Row="1" SelectionMode="None" ItemTemplate="{StaticResource ResultRow}" MaxWidth="900" HorizontalAlignment="Left" />
             <ProgressRing x:Name="Searching" Grid.Row="1" IsActive="False" VerticalAlignment="Top" Margin="0,40" />
             <TextBlock x:Name="SearchEmpty" Grid.Row="1" Style="{StaticResource Secondary}" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40" TextWrapping="Wrap" TextAlignment="Center" />

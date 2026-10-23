@@ -6,6 +6,7 @@
     xmlns:app="using:AbsPlayer.App">
     <ScrollViewer>
         <StackPanel Padding="24,8,24,24" Spacing="4">
+            <TextBlock x:Name="IsbnNote" Style="{StaticResource Secondary}" FontSize="14" TextWrapping="Wrap" Margin="0,8,0,0" Visibility="Collapsed" />
             <ProgressRing x:Name="Searching" IsActive="False" HorizontalAlignment="Center" Margin="0,40" />
             <TextBlock x:Name="NoResults" Text="No results" Style="{StaticResource Secondary}" FontSize="14" HorizontalAlignment="Center" Margin="0,40" Visibility="Collapsed" />
 

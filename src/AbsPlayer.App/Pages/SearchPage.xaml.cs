@@ -20,13 +20,15 @@ public sealed partial class SearchPage : Page
 
     private void OnLibraryChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(LibraryModel.SearchResults) or nameof(LibraryModel.Searching)) Render();
+        if (e.PropertyName is nameof(LibraryModel.SearchResults) or nameof(LibraryModel.Searching) or nameof(LibraryModel.IsbnNote)) Render();
     }
 
     private void Render()
     {
         var r = Services.Library.SearchResults;
         Searching.IsActive = r is null && Services.Library.Searching;
+        IsbnNote.Text = Services.Library.IsbnNote ?? "";
+        IsbnNote.Visibility = Ui.Show(IsbnNote.Text.Length > 0);
         NoResults.Visibility = Ui.Show(r is { IsEmpty: true });
         AuthorsSection.Visibility = Ui.Show(r is { Authors.Count: > 0 });
         SeriesSection.Visibility = Ui.Show(r is { Series.Count: > 0 });

@@ -50,7 +50,7 @@ public static class Services
         var (engine, nowPlaying) = SmtcNowPlaying.Create();
         Audio = new AudioPlayer(engine, nowPlaying, Prefs, Settings, Dispatch);
         Playback = new PlaybackController(Repository, Audio, Progress, Prefs, offline: Downloads, dispatch: Dispatch);
-        Library = new LibraryModel(Repository, Prefs);
+        Library = new LibraryModel(Repository, Prefs, new IsbnLookup(Http));
         Updates = new UpdateChecker(downloadHttp, Settings, AppConfig.Version);
         Requester = new RequesterClient(Settings, secrets, Http);
         Downloads.ResumeUnfinished();

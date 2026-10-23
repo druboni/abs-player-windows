@@ -87,6 +87,8 @@ This program will not transfer any information to other networked systems unless
 
 If you connect [Audiobook Requester](https://github.com/druboni/audiobook-requester) in Settings, it also contacts that server, at the address you enter, to search for and request books.
 
+If you search the library for an ISBN, the app asks [Open Library](https://openlibrary.org) which book it is (only the ISBN is sent), then searches your library for that title.
+
 The one exception is the update check. Once a day it asks GitHub's public API (`api.github.com`) for the latest release of this app, and it downloads the installer from GitHub when you choose **Download and install**. These requests carry no account, library or listening data. Turn the check off in **Settings → Updates**.
 
 ## License

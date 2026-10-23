@@ -7,7 +7,7 @@ using AbsPlayer.Core.Storage;
 namespace AbsPlayer.Core;
 
 /// <summary>What the library screen shows: libraries, books page by page, series, search and progress. Use from the UI thread.</summary>
-public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : INotifyPropertyChanged
+public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs, IsbnLookup? isbnLookup = null) : INotifyPropertyChanged
 {
     private int _page;
     private bool _hasMore;
@@ -25,6 +25,8 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
     public ObservableCollection<BookSeries> Series { get; } = [];
     public SearchResponse? SearchResults { get; private set; }
     public bool Searching { get; private set; }
+    /// <summary>When the search was an ISBN: what it matched, or why nothing was searched.</summary>
+    public string? IsbnNote { get; private set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -70,19 +72,47 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs) : 
         var version = ++_searchVersion;
         if (Selected is not { } lib || q.Length == 0)
         {
-            SearchResults = null; Searching = false;
-            Notify(nameof(SearchResults)); Notify(nameof(Searching));
+            SearchResults = null; Searching = false; IsbnNote = null;
+            Notify(nameof(IsbnNote)); Notify(nameof(SearchResults)); Notify(nameof(Searching));
             return;
         }
         Searching = true;
         Notify(nameof(Searching));
         SearchResponse? results = null;
-        try { results = await repository.Search(lib.Id, q); }
-        catch (ApiException) { }
+        string? note = null;
+        // An ISBN: books rarely have one stored, so look up the title and search for that.
+        if (isbnLookup is not null && IsbnLookup.Parse(q) is { } isbn)
+        {
+            try
+            {
+                if (await isbnLookup.Lookup(isbn) is { } info)
+                {
+                    note = $"ISBN {isbn} is {info.Description}.";
+                    q = info.ShortTitle;
+                }
+                else
+                {
+                    note = $"No book found for ISBN {isbn}.";
+                    results = new SearchResponse { Books = [], Series = [], Authors = [] };
+                }
+            }
+            catch (HttpRequestException)
+            {
+                note = "Couldn't reach Open Library to look up that ISBN. Try the title instead.";
+                results = new SearchResponse { Books = [], Series = [], Authors = [] };
+            }
+            if (version != _searchVersion) return;
+        }
+        if (results is null)
+        {
+            try { results = await repository.Search(lib.Id, q); }
+            catch (ApiException) { }
+        }
         if (version != _searchVersion) return;
         SearchResults = results;
+        IsbnNote = note;
         Searching = false;
-        Notify(nameof(SearchResults)); Notify(nameof(Searching));
+        Notify(nameof(IsbnNote)); Notify(nameof(SearchResults)); Notify(nameof(Searching));
     }
 
     private bool _seriesLoading;

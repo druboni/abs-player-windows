@@ -46,7 +46,7 @@
                 <FontIcon Glyph="&#xE7F6;" Foreground="{StaticResource AccentText}" FontSize="18" />
                 <TextBlock x:Name="AppTitle" Text="ABS Player" Style="{StaticResource BodyStrongTextBlockStyle}" />
             </StackPanel>
-            <AutoSuggestBox x:Name="SearchBox" Grid.Column="3" Width="320" PlaceholderText="Titles, authors, series"
+            <AutoSuggestBox x:Name="SearchBox" Grid.Column="3" Width="320" PlaceholderText="Titles, authors, series, ISBN"
                             QueryIcon="Find" TextChanged="OnSearchTextChanged" VerticalAlignment="Center" />
             <Button x:Name="RequestButton" Grid.Column="4" Click="OnRequestsClick" ToolTipService.ToolTip="Request a book (Audiobook Requester)" Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal" Spacing="6">
