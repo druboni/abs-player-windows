@@ -11,7 +11,7 @@ public interface ISecretStore
     void Set(string key, string? value);
 }
 
-/// <summary>Windows Credential Locker (shows up in Credential Manager under the resource name).</summary>
+/// <summary>Windows Credential Locker (shows up in Credential Manager under the resource name, "ABS Player" from before the rename, kept so sign-ins carry over).</summary>
 public sealed class CredentialLockerStore(string resource = "ABS Player") : ISecretStore
 {
     private readonly PasswordVault _vault = new();

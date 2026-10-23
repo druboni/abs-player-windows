@@ -6,23 +6,24 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <RootNamespace>AbsPlayer.App</RootNamespace>
-    <AssemblyName>ABSPlayer</AssemblyName>
+    <AssemblyName>Homeshelf</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <!-- Needed even unpackaged: without it, publish leaves out ABSPlayer.pri (the compiled XAML) and the app dies on launch. -->
+    <!-- Needed even unpackaged: without it, publish leaves out Homeshelf.pri (the compiled XAML) and the app dies on launch. -->
     <EnableMsixTooling>true</EnableMsixTooling>
     <!-- Program.cs provides Main (single instance). -->
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <SelfContained>true</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.3.1</Version>
+    <Version>0.4.0</Version>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
-    <Product>ABS Player</Product>
+    <Product>Homeshelf</Product>
+    <AssemblyTitle>Homeshelf</AssemblyTitle>
     <Company>druboni</Company>
   </PropertyGroup>
 

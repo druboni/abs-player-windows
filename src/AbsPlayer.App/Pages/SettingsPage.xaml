@@ -82,7 +82,7 @@
                     <TextBlock x:Name="UpdateStatus" VerticalAlignment="Center" Style="{StaticResource Secondary}" FontSize="14" />
                 </StackPanel>
                 <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap"
-                           Text="Once a day, the app asks GitHub for the newest release of ABS Player. Nothing about you or your library is sent." />
+                           Text="Once a day, the app asks GitHub for the newest release of Homeshelf. Nothing about you or your library is sent." />
             </StackPanel>
 
             <TextBlock Text="Keyboard shortcuts" Style="{StaticResource SectionHeader}" />
@@ -111,7 +111,7 @@
             <TextBlock Text="About" Style="{StaticResource SectionHeader}" />
             <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="4">
                 <TextBlock x:Name="AppVersionText" />
-                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap" Text="ABS Player is an independent app and is not affiliated with the Audiobookshelf project." />
+                <TextBlock Style="{StaticResource Secondary}" TextWrapping="Wrap" Text="Homeshelf is an independent app and is not affiliated with the Audiobookshelf project." />
                 <HyperlinkButton Content="Audiobookshelf website" NavigateUri="https://www.audiobookshelf.org" Padding="0" />
             </StackPanel>
         </StackPanel>

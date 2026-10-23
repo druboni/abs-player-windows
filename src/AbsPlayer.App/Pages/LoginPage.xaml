@@ -6,7 +6,7 @@
     <ScrollViewer>
         <StackPanel MaxWidth="360" Spacing="16" Padding="32" HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <FontIcon Glyph="&#xE7F6;" FontSize="56" Foreground="{StaticResource AccentText}" />
-            <TextBlock Text="ABS Player" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="Homeshelf" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock Text="Sign in to your Audiobookshelf server" Style="{StaticResource Secondary}" HorizontalAlignment="Center" />
 
             <TextBox x:Name="Server" Header="Server address" PlaceholderText="abs.example.com or 192.168.1.10:13378"

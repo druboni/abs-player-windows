@@ -17,7 +17,7 @@ public class PlaybackControllerTests
 
         var (play, body) = h.Calls("POST", "/api/items/b1/play").Single();
         var device = Body(body).GetProperty("deviceInfo");
-        Assert.Equal("ABS Player Windows", device.GetProperty("clientName").GetString());
+        Assert.Equal("Homeshelf Windows", device.GetProperty("clientName").GetString());
         Assert.Equal(h.Env.Prefs.DeviceId, device.GetProperty("deviceId").GetString());
 
         Assert.Equal("b1", h.Controller.ItemId);

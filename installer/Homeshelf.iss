@@ -1,19 +1,20 @@
-; Inno Setup script for ABS Player for Windows.
+; Inno Setup script for Homeshelf for Windows (formerly ABS Player).
 ; Installs per user (no admin prompt) unless the user picks "all users" on the first page.
 ; Normally run through build.ps1, which publishes the app first and passes the version.
 ;
 ; By hand:
-;   "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=0.1.0 installer\ABSPlayer.iss
+;   "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=0.1.0 installer\Homeshelf.iss
 
-#define MyAppName "ABS Player"
+#define MyAppName "Homeshelf"
 #ifndef MyAppVersion
   #define MyAppVersion "0.1.0"
 #endif
 #define MyAppPublisher "druboni"
-#define MyAppExe "ABSPlayer.exe"
+#define MyAppExe "Homeshelf.exe"
 #define PublishDir "..\publish\win-x64"
 
 [Setup]
+; Same AppId as when the app was called ABS Player, so installing upgrades it in place.
 AppId={{4B7D2E91-6A3C-4F58-B0D1-9E2A7C5F3B18}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
@@ -22,13 +23,15 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
+; Use the new Start menu name even when upgrading from ABS Player.
+UsePreviousGroup=no
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
 OutputDir=Output
-OutputBaseFilename=ABSPlayer-{#MyAppVersion}-Setup
+OutputBaseFilename=Homeshelf-{#MyAppVersion}-Setup
 SetupIconFile=..\src\AbsPlayer.App\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\{#MyAppExe}
 Compression=lzma2/max
@@ -36,13 +39,21 @@ SolidCompression=yes
 WizardStyle=modern
 ; Close a running copy before upgrading, and start it again afterwards.
 CloseApplications=yes
-RestartApplications=yes
+; The [Run] entries below reopen the app (the old ABSPlayer.exe it would restart is gone).
+RestartApplications=no
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional shortcuts:"; Flags: unchecked
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[InstallDelete]
+; Left over from when the app was called ABS Player: the old program files and shortcuts.
+Type: files; Name: "{app}\ABSPlayer.*"
+Type: filesandordirs; Name: "{autoprograms}\ABS Player"
+Type: files; Name: "{autoprograms}\ABS Player.lnk"
+Type: files; Name: "{autodesktop}\ABS Player.lnk"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExe}"

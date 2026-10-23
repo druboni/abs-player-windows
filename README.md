@@ -1,8 +1,8 @@
-# ABS Player for Windows
+# Homeshelf for Windows
 
 A native Windows (WinUI 3, .NET 10) audiobook player for [Audiobookshelf](https://www.audiobookshelf.org). It's a port of [abs-player-apple](https://github.com/druboni/abs-player-apple), and it syncs position the same way that app does.
 
-> ABS Player is an independent app and is not affiliated with the Audiobookshelf project.
+> Homeshelf (formerly ABS Player) is an independent app and is not affiliated with the Audiobookshelf project.
 
 ## Layout
 ```
@@ -22,18 +22,18 @@ tests/AbsPlayer.Core.Tests/  xUnit tests
 ## Building and running
 ```
 dotnet build src/AbsPlayer.App -p:Platform=x64
-src\AbsPlayer.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ABSPlayer.exe
+src\AbsPlayer.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Homeshelf.exe
 ```
 
 ## Installer
 ```
 pwsh installer\build.ps1
 ```
-Runs the tests, publishes a self-contained Release build (it bundles .NET and the Windows App SDK, so nothing else needs installing) and compiles `installer\ABSPlayer.iss` with [Inno Setup 6](https://jrsoftware.org/isinfo.php). Output: `installer\Output\ABSPlayer-<version>-Setup.exe` (about 60 MB). The version comes from `<Version>` in `src\AbsPlayer.App\AbsPlayer.App.csproj`.
+Runs the tests, publishes a self-contained Release build (it bundles .NET and the Windows App SDK, so nothing else needs installing) and compiles `installer\Homeshelf.iss` with [Inno Setup 6](https://jrsoftware.org/isinfo.php). Output: `installer\Output\Homeshelf-<version>-Setup.exe` (about 60 MB). The version comes from `<Version>` in `src\AbsPlayer.App\AbsPlayer.App.csproj`.
 
 The installer installs for the current user by default, with no admin prompt. It offers an "all users" install on its first page. Uninstalling keeps settings, saved positions and the sign-in token, so a reinstall picks up where you left off. `installer\make-icon.py` redraws the app icon.
 
-Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager), never in the settings file.
+Data lives in `%LOCALAPPDATA%\ABSPlayer`. Sign-in tokens are stored in Windows Credential Locker under "ABS Player" (visible in Credential Manager; the folder and this entry keep the app's old name so nothing is lost), never in the settings file.
 
 ## Tests
 ```
@@ -92,7 +92,7 @@ If you search the library for an ISBN, the app asks [Open Library](https://openl
 The one exception is the update check. Once a day it asks GitHub's public API (`api.github.com`) for the latest release of this app, and it downloads the installer from GitHub when you choose **Download and install**. These requests carry no account, library or listening data. Turn the check off in **Settings → Updates**.
 
 ## License
-[MIT](LICENSE). ABS Player is an independent app and is not affiliated with the Audiobookshelf project.
+[MIT](LICENSE). Homeshelf is an independent app and is not affiliated with the Audiobookshelf project.
 
 ## Status
 - [x] Step 1: API client, models, repository, token storage, offline progress

@@ -25,7 +25,7 @@ public sealed partial class SettingsPage : Page
         _loading = true;
         ServerText.Text = Services.User.ServerUrl ?? "—";
         UserText.Text = Services.User.Username ?? "—";
-        AppVersionText.Text = $"ABS Player for Windows {AppConfig.Version}";
+        AppVersionText.Text = $"Homeshelf for Windows {AppConfig.Version}";
 
         Fill(SkipBack, Prefs.SkipOptions.Select(s => new Option<int>($"{s} seconds", s)), Prefs.SkipBack);
         Fill(SkipForward, Prefs.SkipOptions.Select(s => new Option<int>($"{s} seconds", s)), Prefs.SkipForward);

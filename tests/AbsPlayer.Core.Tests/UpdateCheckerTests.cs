@@ -10,7 +10,7 @@ public class UpdateCheckerTests
     private static readonly byte[] InstallerBytes = Encoding.UTF8.GetBytes("pretend installer");
     private static readonly string InstallerSha = Convert.ToHexString(SHA256.HashData(InstallerBytes)).ToLowerInvariant();
 
-    private static string Release(string tag, bool draft = false, string? digest = null, string asset = "ABSPlayer-x-Setup.exe") =>
+    private static string Release(string tag, bool draft = false, string? digest = null, string asset = "Homeshelf-x-Setup.exe") =>
         "{\"tag_name\":\"" + tag + "\",\"html_url\":\"https://github.com/r/releases/tag/" + tag + "\",\"draft\":" + (draft ? "true" : "false")
         + ",\"assets\":[{\"name\":\"" + asset + "\",\"browser_download_url\":\"https://github.com/dl/" + tag + "/" + asset + "\""
         + (digest is null ? "" : ",\"digest\":\"" + digest + "\"") + "}]}";
@@ -44,7 +44,7 @@ public class UpdateCheckerTests
         Assert.Equal(new Version(0, 2, 0), u!.Version);
         Assert.Equal("v0.2.0", u.Tag);
         Assert.Equal("ABC", u.Sha256);
-        Assert.Equal("https://github.com/dl/v0.2.0/ABSPlayer-x-Setup.exe", u.InstallerUrl.AbsoluteUri);
+        Assert.Equal("https://github.com/dl/v0.2.0/Homeshelf-x-Setup.exe", u.InstallerUrl.AbsoluteUri);
         Assert.Contains("/repos/druboni/abs-player-windows/releases", env.Handler.Requests[0].Request.RequestUri!.AbsoluteUri);
     }
 

@@ -25,7 +25,7 @@ public static class Program
 
     private static bool RedirectedToRunningCopy()
     {
-        var main = AppInstance.FindOrRegisterForKey("ABSPlayer");
+        var main = AppInstance.FindOrRegisterForKey("ABSPlayer"); // Internal key, unchanged by the rename to Homeshelf.
         if (main.IsCurrent)
         {
             main.Activated += (_, _) => App.BringToFront();

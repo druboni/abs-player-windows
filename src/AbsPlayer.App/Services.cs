@@ -39,12 +39,12 @@ public static class Services
         User = new UserPreferences(Settings, secrets);
         Prefs = new Prefs(Settings);
         Http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        Http.DefaultRequestHeaders.UserAgent.ParseAdd($"ABSPlayerWindows/{AppConfig.Version}");
+        Http.DefaultRequestHeaders.UserAgent.ParseAdd($"HomeshelfWindows/{AppConfig.Version}");
         Repository = new AudiobookRepository(User, Http);
         Progress = new LocalProgressStore(Path.Combine(dir, "local_progress.json"));
         // Big files: no overall time limit (a dropped connection is detected and resumed instead).
         var downloadHttp = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
-        downloadHttp.DefaultRequestHeaders.UserAgent.ParseAdd($"ABSPlayerWindows/{AppConfig.Version}");
+        downloadHttp.DefaultRequestHeaders.UserAgent.ParseAdd($"HomeshelfWindows/{AppConfig.Version}");
         Downloads = new DownloadManager(Repository, downloadHttp, Prefs, Path.Combine(dir, "Downloads"), IsMetered, dispatch: Dispatch);
         Repository.LocalCoverResolver = Downloads.LocalCover;
         var (engine, nowPlaying) = SmtcNowPlaying.Create();

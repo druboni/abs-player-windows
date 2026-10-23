@@ -66,7 +66,7 @@ public partial class App : Application
         try
         {
             Directory.CreateDirectory(AppConfig.DataDirectory);
-            File.AppendAllText(LogPath, $"{DateTimeOffset.Now:u}  ABS Player {AppConfig.Version}  Windows {Environment.OSVersion.Version}\n{e}\n\n");
+            File.AppendAllText(LogPath, $"{DateTimeOffset.Now:u}  Homeshelf {AppConfig.Version}  Windows {Environment.OSVersion.Version}\n{e}\n\n");
         }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
@@ -80,8 +80,8 @@ public partial class App : Application
         if (_reported) return;
         _reported = true;
         Log(e);
-        MessageBox(IntPtr.Zero, $"ABS Player ran into a problem and has to close.\n\n{e?.Message}\n\nDetails were saved to:\n{LogPath}",
-            "ABS Player", 0x10 /* MB_ICONERROR */);
+        MessageBox(IntPtr.Zero, $"Homeshelf ran into a problem and has to close.\n\n{e?.Message}\n\nDetails were saved to:\n{LogPath}",
+            "Homeshelf", 0x10 /* MB_ICONERROR */);
     }
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]

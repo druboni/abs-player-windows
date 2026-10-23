@@ -45,5 +45,5 @@ jobs:
         run: |
           $tag = "${{ github.ref_name }}"
           gh release view $tag 2>$null
-          if ($LASTEXITCODE -ne 0) { gh release create $tag --prerelease --title "ABS Player $($tag.TrimStart('v'))" --generate-notes }
+          if ($LASTEXITCODE -ne 0) { gh release create $tag --prerelease --title "Homeshelf $($tag.TrimStart('v'))" --generate-notes }
           gh release upload $tag (Get-Item installer/Output/*.exe).FullName --clobber

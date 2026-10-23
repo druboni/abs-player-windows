@@ -59,7 +59,7 @@ public sealed partial class MainWindow : Window
         _update = update;
         UpdateBar.Severity = InfoBarSeverity.Informational;
         UpdateBar.Title = "Update available";
-        UpdateBar.Message = $"ABS Player {update.Version} is available. You have {AppConfig.Version}.";
+        UpdateBar.Message = $"Homeshelf {update.Version} is available. You have {AppConfig.Version}.";
         ReleaseNotesLink.NavigateUri = update.ReleasePage;
         UpdateButton.IsEnabled = true;
         UpdateProgress.Visibility = Visibility.Collapsed;
@@ -72,13 +72,13 @@ public sealed partial class MainWindow : Window
         if (_update is not { } update) return;
         UpdateButton.IsEnabled = false;
         UpdateBar.IsClosable = false;
-        UpdateBar.Message = $"Downloading ABS Player {update.Version}…";
+        UpdateBar.Message = $"Downloading Homeshelf {update.Version}…";
         UpdateProgress.Value = 0;
         UpdateProgress.Visibility = Visibility.Visible;
         try
         {
             var installer = await Services.Updates.Download(update, new Progress<double>(p => UpdateProgress.Value = p));
-            UpdateBar.Message = "Installing… ABS Player will reopen when it's done.";
+            UpdateBar.Message = "Installing… Homeshelf will reopen when it's done.";
             await Task.WhenAny(Services.Playback.Stop(), Task.Delay(TimeSpan.FromSeconds(5)));
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(installer, "/SILENT /SUPPRESSMSGBOXES /NORESTART")
             {
