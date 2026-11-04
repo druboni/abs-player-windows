@@ -18,6 +18,8 @@ public sealed class WindowsMediaEngine : IMediaEngine, IDisposable
     private bool _wantPlay;
     private bool _ended;
     private double _rate = 1;
+    /// <summary>Files that failed to open, by index. A failed preload of the next file is only reported once it's reached.</summary>
+    private readonly Dictionary<int, string> _failed = [];
 
     public event EventHandler? Ended;
     public event EventHandler<string>? Failed;
@@ -50,18 +52,41 @@ public sealed class WindowsMediaEngine : IMediaEngine, IDisposable
             lock (_lock) rate = _rate;
             _player.PlaybackSession.PlaybackRate = rate;
             TryApplyPending();
+            ReportIfFailed(list);
         };
-        list.ItemFailed += (_, e) => Failed?.Invoke(this, e.Error.ErrorCode.ToString());
+        list.ItemFailed += (_, e) =>
+        {
+            var index = list.Items.IndexOf(e.Item);
+            var message = $"Can't play file {index + 1} of {list.Items.Count} ({e.Error.ErrorCode}). " +
+                "It may be missing on the server, or in a format Windows can't play.";
+            lock (_lock) _failed[index] = message;
+            ReportIfFailed(list);
+        };
         if (index > 0 && index < list.Items.Count) list.StartingItem = list.Items[index];
         lock (_lock)
         {
             _list = list;
+            _failed.Clear();
             _ended = false;
             _wantPlay = false;
             _pendingIndex = Math.Clamp(index, 0, Math.Max(urls.Count - 1, 0));
             _pendingSeek = localSeconds;
         }
         _player.Source = list;
+    }
+
+    /// <summary>Raises <see cref="Failed"/> if the file being played (or waited for) is one that failed to open.</summary>
+    private void ReportIfFailed(MediaPlaybackList list)
+    {
+        string? message;
+        lock (_lock)
+        {
+            if (_list != list) return;
+            var index = _pendingIndex >= 0 ? _pendingIndex : (int)list.CurrentItemIndex;
+            if (!_failed.TryGetValue(index, out message)) return;
+            _wantPlay = false;
+        }
+        Failed?.Invoke(this, message);
     }
 
     /// <summary>Applies a held seek once the target file is the current one and has opened.</summary>
@@ -121,6 +146,7 @@ public sealed class WindowsMediaEngine : IMediaEngine, IDisposable
         if (_player.PlaybackSession.PlaybackState == MediaPlaybackState.Playing) _player.Pause();
         list.MoveTo((uint)index);
         TryApplyPending();
+        ReportIfFailed(list);
     }
 
     public void Close()

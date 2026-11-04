@@ -138,6 +138,26 @@ public class WindowsEngineTests : IDisposable
     }
 
     [Fact]
+    public async Task Missing_later_file_doesnt_stop_the_current_one()
+    {
+        var (engine, _) = SmtcNowPlaying.Create();
+        using var _e = engine;
+        engine.Volume = 0;
+        string? failure = null;
+        engine.Failed += (_, m) => failure = m;
+        // Windows preloads file 2 while file 1 plays; that failure waits until file 2 is reached.
+        engine.Open([_files[0], new Uri(Path.Combine(_dir, "missing.mp3"))], 0, 0);
+        engine.Play();
+        await WaitFor(() => engine.LocalPosition > 1.5, "playing file 1");
+        Assert.Null(failure);
+
+        engine.Seek(1, 0);
+        await WaitFor(() => failure is not null, "failure on reaching file 2");
+        Assert.Contains("file 2 of 2", failure);
+        engine.Close();
+    }
+
+    [Fact]
     public void Overlay_accepts_updates()
     {
         var (engine, np) = SmtcNowPlaying.Create();
