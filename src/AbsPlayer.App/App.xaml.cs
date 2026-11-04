@@ -41,6 +41,7 @@ public partial class App : Application
         if (Current is not App { _window: { } window }) return;
         window.DispatcherQueue.TryEnqueue(() =>
         {
+            if (!window.AppWindow.IsVisible) window.AppWindow.Show(); // Hidden in the notification area.
             if (window.AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } p) p.Restore();
             window.Activate();
             SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(window));

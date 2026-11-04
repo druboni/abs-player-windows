@@ -75,6 +75,7 @@
             <TextBlock Text="Updates" Style="{StaticResource SectionHeader}" />
             <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
                 <ToggleSwitch x:Name="AutoUpdate" Header="Check for updates automatically" Toggled="OnAutoUpdateToggled" />
+                <ToggleSwitch x:Name="KeepInTray" Header="Keep running in the notification area when I close the window" Toggled="OnKeepInTrayToggled" />
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <Button x:Name="CheckNowButton" Content="Check Now" Click="OnCheckNow" />
                     <ProgressRing x:Name="CheckingRing" Width="20" Height="20" IsActive="False" />

@@ -77,6 +77,8 @@ public sealed class Prefs(SettingsStore settings)
         public const string HideFinished = "hide_finished";
         public const string RemoveDownloadWhenFinished = "remove_download_when_finished";
         public const string DownloadOnWiFiOnly = "download_wifi_only";
+        public const string KeepRunningInTray = "keep_running_in_tray";
+        public const string TrayNoticeShown = "tray_notice_shown";
     }
 
     public static readonly int[] SkipOptions = [10, 15, 30, 45, 60];
@@ -128,6 +130,20 @@ public sealed class Prefs(SettingsStore settings)
     {
         get => settings.Get<bool?>(Key.SeriesSortDescending) ?? SeriesSort.DefaultDescending();
         set => settings.Set(Key.SeriesSortDescending, value);
+    }
+
+    /// <summary>Closing the window leaves the app (and the book) running in the notification area.</summary>
+    public bool KeepRunningInTray
+    {
+        get => settings.Get<bool?>(Key.KeepRunningInTray) ?? true;
+        set => settings.Set(Key.KeepRunningInTray, value);
+    }
+
+    /// <summary>The "still running" notice is shown once, the first time the window is closed to the tray.</summary>
+    public bool TrayNoticeShown
+    {
+        get => settings.Get<bool?>(Key.TrayNoticeShown) ?? false;
+        set => settings.Set(Key.TrayNoticeShown, value);
     }
 
     public bool HideFinished

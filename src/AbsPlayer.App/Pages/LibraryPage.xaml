@@ -54,7 +54,7 @@
                     <Grid Margin="0,8,0,4">
                         <TextBlock x:Name="LibraryName" Style="{StaticResource SectionHeader}" VerticalAlignment="Center" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                            <DropDownButton x:Name="SortButton" VerticalAlignment="Center" ToolTipService.ToolTip="Sort">
+                            <DropDownButton x:Name="SortButton" VerticalAlignment="Center" ToolTipService.ToolTip="Sort" AutomationProperties.Name="Sort">
                                 <DropDownButton.Content>
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon Glyph="&#xE8CB;" FontSize="14" />
@@ -62,7 +62,7 @@
                                     </StackPanel>
                                 </DropDownButton.Content>
                                 <DropDownButton.Flyout>
-                                    <MenuFlyout x:Name="SortMenu" Placement="BottomEdgeAlignedRight" />
+                                    <MenuFlyout x:Name="SortMenu" Placement="BottomEdgeAlignedRight" ShouldConstrainToRootBounds="False" />
                                 </DropDownButton.Flyout>
                             </DropDownButton>
                             <SelectorBar x:Name="Mode" SelectionChanged="OnModeChanged">

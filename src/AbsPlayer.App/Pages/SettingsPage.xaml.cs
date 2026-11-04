@@ -33,6 +33,7 @@ public sealed partial class SettingsPage : Page
         Fill(Speed, AudioPlayer.Speeds.Select(s => new Option<double>(Format.Speed(s), s)), Services.Audio.Speed);
         HideFinished.IsOn = Prefs.HideFinished;
         AutoUpdate.IsOn = Services.Updates.Enabled;
+        KeepInTray.IsOn = Prefs.KeepRunningInTray;
         MeteredOnly.IsOn = Prefs.DownloadOnWiFiOnly;
         RemoveFinished.IsOn = Prefs.RemoveDownloadWhenFinished;
         RenderDownloads();
@@ -58,6 +59,13 @@ public sealed partial class SettingsPage : Page
     private void OnRewindChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Prefs.RewindOnResume = Picked<int>(Rewind); }
     private void OnSpeedChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) Services.Audio.SetSpeed(Picked<double>(Speed)); }
     private void OnHideFinishedToggled(object sender, RoutedEventArgs e) { if (!_loading) Prefs.HideFinished = HideFinished.IsOn; }
+
+    private void OnKeepInTrayToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        Prefs.KeepRunningInTray = KeepInTray.IsOn;
+        App.Window.UpdateTray();
+    }
 
     // Audiobook Requester
 

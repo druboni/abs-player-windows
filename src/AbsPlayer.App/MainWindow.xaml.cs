@@ -14,6 +14,9 @@ public sealed partial class MainWindow : Window
 {
     private CancellationTokenSource? _searchDelay;
     private bool _closing;
+    private bool _quitting;
+    private TrayIcon? _tray;
+    private string? _trayTitle;
     private bool _pickingLibrary;
 
     public MainWindow()
@@ -23,6 +26,9 @@ public sealed partial class MainWindow : Window
         AppWindow.Resize(new SizeInt32((int)(1100 * scale), (int)(780 * scale)));
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         AppWindow.Closing += OnClosing;
+        Closed += (_, _) => _tray?.Dispose();
+        UpdateTray();
+        Services.Playback.PropertyChanged += (_, _) => UpdateTrayTooltip();
         VisibilityChanged += OnVisibilityChanged;
         Services.Repository.Api.SessionExpired += (_, _) => Services.Dispatcher.TryEnqueue(() =>
         {
@@ -269,9 +275,66 @@ public sealed partial class MainWindow : Window
         else Services.Playback.SyncNow();
     }
 
-    /// <summary>Closes the server session (saving the final position) before the window goes away.</summary>
+    // Notification area
+
+    /// <summary>Shows or removes the notification-area icon to match the setting.</summary>
+    public void UpdateTray()
+    {
+        if (!Services.Prefs.KeepRunningInTray)
+        {
+            _tray?.Dispose();
+            _tray = null;
+            return;
+        }
+        if (_tray is null)
+        {
+            _tray = new TrayIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"))
+            {
+                PlaybackState = () => (Services.Playback.IsActive, Services.Audio.IsPlaying),
+            };
+            _tray.OpenRequested += (_, _) => App.BringToFront();
+            _tray.ToggleRequested += (_, _) => Services.Audio.Toggle();
+            _tray.QuitRequested += (_, _) => Quit();
+            _trayTitle = null;
+        }
+        _tray.Show();
+        UpdateTrayTooltip();
+    }
+
+    private void UpdateTrayTooltip()
+    {
+        if (_tray is null) return;
+        var title = Services.Playback.IsActive && Services.Playback.Title.Length > 0 ? Services.Playback.Title : null;
+        if (title == _trayTitle && _trayTitle is not null) return;
+        _trayTitle = title;
+        _tray.Tooltip = title is null ? "Homeshelf" : $"Homeshelf - {title}";
+    }
+
+    /// <summary>Really closes the app (from the tray menu, or Windows signing out), saving the position first.</summary>
+    public void Quit()
+    {
+        _quitting = true;
+        Close();
+    }
+
+    /// <summary>
+    /// With the tray on, closing just hides the window and the book keeps playing. Otherwise (or on Quit)
+    /// closes the server session, saving the final position, before the window goes away.
+    /// </summary>
     private async void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
+        if (!_closing && !_quitting && _tray is not null)
+        {
+            args.Cancel = true;
+            AppWindow.Hide();
+            if (!Services.Prefs.TrayNoticeShown)
+            {
+                Services.Prefs.TrayNoticeShown = true;
+                _tray.Notify("Homeshelf is still running",
+                    "It keeps playing here. Click the icon to open it, or right-click and choose Quit. You can turn this off in Settings.");
+            }
+            return;
+        }
         if (_closing || !Services.Playback.IsActive) return;
         args.Cancel = true;
         _closing = true;
