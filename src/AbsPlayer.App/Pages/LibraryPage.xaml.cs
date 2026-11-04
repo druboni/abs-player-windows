@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using AbsPlayer.Core;
 using AbsPlayer.Core.Models;
+using AbsPlayer.Core.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -28,6 +29,7 @@ public sealed partial class LibraryPage : Page
         RefreshDownloaded();
         RefreshHeader();
         RefreshContinue();
+        BuildSortMenu();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -124,9 +126,58 @@ public sealed partial class LibraryPage : Page
         foreach (var vm in BookVm.From(Model.VisibleItems())) _tiles.Add(vm);
     }
 
+    /// <summary>The sort menu for what's showing: books or series. Each sort can run either way.</summary>
+    private void BuildSortMenu()
+    {
+        var prefs = Services.Prefs;
+        SortMenu.Items.Clear();
+        if (_seriesMode)
+        {
+            foreach (var s in Enum.GetValues<SeriesSort>())
+                SortMenu.Items.Add(SortItem(s.Label(), "sort", s == prefs.SeriesSort, () =>
+                {
+                    prefs.SeriesSort = s;
+                    prefs.SeriesSortDescending = s.DefaultDescending();
+                }));
+            AddDirections(prefs.SeriesSort.DirectionLabels(), prefs.SeriesSortDescending, d => prefs.SeriesSortDescending = d);
+            SortLabel.Text = prefs.SeriesSort.Label();
+        }
+        else
+        {
+            foreach (var s in Enum.GetValues<LibrarySort>())
+                SortMenu.Items.Add(SortItem(s.Label(), "sort", s == prefs.LibrarySort, () =>
+                {
+                    prefs.LibrarySort = s;
+                    prefs.LibrarySortDescending = s.DefaultDescending();
+                }));
+            AddDirections(prefs.LibrarySort.DirectionLabels(), prefs.LibrarySortDescending, d => prefs.LibrarySortDescending = d);
+            SortLabel.Text = prefs.LibrarySort.Label();
+        }
+    }
+
+    private void AddDirections((string Ascending, string Descending) labels, bool descending, Action<bool> set)
+    {
+        SortMenu.Items.Add(new MenuFlyoutSeparator());
+        SortMenu.Items.Add(SortItem(labels.Ascending, "direction", !descending, () => set(false)));
+        SortMenu.Items.Add(SortItem(labels.Descending, "direction", descending, () => set(true)));
+    }
+
+    private RadioMenuFlyoutItem SortItem(string text, string group, bool isChecked, Action apply)
+    {
+        var item = new RadioMenuFlyoutItem { Text = text, GroupName = group, IsChecked = isChecked };
+        item.Click += async (_, _) =>
+        {
+            apply();
+            BuildSortMenu();
+            await Services.Library.Reload();
+        };
+        return item;
+    }
+
     private async void OnModeChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
         _seriesMode = sender.SelectedItem?.Text == "Series";
+        BuildSortMenu();
         _tiles.Clear();
         if (!_seriesMode) { RebuildBooks(); return; }
         foreach (var s in Model.Series) _tiles.Add(new SeriesVm(s));

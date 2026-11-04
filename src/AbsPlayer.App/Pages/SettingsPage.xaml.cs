@@ -31,7 +31,6 @@ public sealed partial class SettingsPage : Page
         Fill(SkipForward, Prefs.SkipOptions.Select(s => new Option<int>($"{s} seconds", s)), Prefs.SkipForward);
         Fill(Rewind, Prefs.RewindOptions.Select(s => new Option<int>(s == 0 ? "Off" : $"{s} seconds", s)), Prefs.RewindOnResume);
         Fill(Speed, AudioPlayer.Speeds.Select(s => new Option<double>(Format.Speed(s), s)), Services.Audio.Speed);
-        Fill(Sort, Enum.GetValues<LibrarySort>().Select(s => new Option<LibrarySort>(s.Label(), s)), Prefs.LibrarySort);
         HideFinished.IsOn = Prefs.HideFinished;
         AutoUpdate.IsOn = Services.Updates.Enabled;
         MeteredOnly.IsOn = Prefs.DownloadOnWiFiOnly;
@@ -173,13 +172,6 @@ public sealed partial class SettingsPage : Page
         }
         CheckingRing.IsActive = false;
         CheckNowButton.IsEnabled = true;
-    }
-
-    private async void OnSortChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_loading) return;
-        Prefs.LibrarySort = Picked<LibrarySort>(Sort);
-        await Services.Library.Reload();
     }
 
     private async void OnSignOut(object sender, RoutedEventArgs e)

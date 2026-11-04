@@ -53,10 +53,23 @@
 
                     <Grid Margin="0,8,0,4">
                         <TextBlock x:Name="LibraryName" Style="{StaticResource SectionHeader}" VerticalAlignment="Center" />
-                        <SelectorBar x:Name="Mode" HorizontalAlignment="Right" SelectionChanged="OnModeChanged">
-                            <SelectorBarItem Text="Books" IsSelected="True" />
-                            <SelectorBarItem Text="Series" />
-                        </SelectorBar>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <DropDownButton x:Name="SortButton" VerticalAlignment="Center" ToolTipService.ToolTip="Sort">
+                                <DropDownButton.Content>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE8CB;" FontSize="14" />
+                                        <TextBlock x:Name="SortLabel" />
+                                    </StackPanel>
+                                </DropDownButton.Content>
+                                <DropDownButton.Flyout>
+                                    <MenuFlyout x:Name="SortMenu" Placement="BottomEdgeAlignedRight" />
+                                </DropDownButton.Flyout>
+                            </DropDownButton>
+                            <SelectorBar x:Name="Mode" SelectionChanged="OnModeChanged">
+                                <SelectorBarItem Text="Books" IsSelected="True" />
+                                <SelectorBarItem Text="Series" />
+                            </SelectorBar>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </GridView.Header>

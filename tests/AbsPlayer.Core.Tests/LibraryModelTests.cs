@@ -80,8 +80,31 @@ public class LibraryModelTests
         await model.Reload();
         Assert.Equal(50, model.Items.Count);
         var last = env.Handler.Requests.Last(r => r.Request.RequestUri!.AbsolutePath.EndsWith("/items")).Request.RequestUri!.Query;
-        Assert.Contains("sort=media.metadata.authorName", last);
+        Assert.Contains("sort=media.metadata.authorNameLF&desc=0", last);
         Assert.Contains("page=0", last);
+
+        prefs.LibrarySortDescending = true;
+        prefs.SeriesSort = SeriesSort.BookCount;
+        await model.Reload();
+        await model.LoadSeries();
+        last = env.Handler.Requests.Last(r => r.Request.RequestUri!.AbsolutePath.EndsWith("/items")).Request.RequestUri!.Query;
+        Assert.Contains("sort=media.metadata.authorNameLF&desc=1", last);
+        var series = env.Handler.Requests.Last(r => r.Request.RequestUri!.AbsolutePath.EndsWith("/series")).Request.RequestUri!.Query;
+        Assert.Contains("sort=numBooks&desc=1", series);
+    }
+
+    [Fact]
+    public void Picking_a_sort_starts_in_its_natural_direction()
+    {
+        var (env, _, prefs) = Setup();
+        using var _e = env;
+        Assert.False(prefs.LibrarySortDescending); // Title: A to Z.
+        prefs.LibrarySort = LibrarySort.RecentlyAdded;
+        Assert.True(prefs.LibrarySortDescending); // Newest first until the listener flips it.
+        prefs.LibrarySortDescending = false;
+        Assert.False(prefs.LibrarySortDescending);
+        Assert.Equal(SeriesSort.Name, prefs.SeriesSort);
+        Assert.False(prefs.SeriesSortDescending);
     }
 
     [Fact]

@@ -58,7 +58,10 @@ public sealed class AudiobookRepository
     public async Task<List<Library>> GetLibraries() => (await _api.GetLibraries()).Libraries;
 
     public Task<LibraryItemsResponse> GetLibraryItems(string libraryId, LibrarySort sort, int page = 0, int limit = 50) =>
-        _api.GetLibraryItems(libraryId, page, limit, sort.ApiField(), sort.Descending());
+        GetLibraryItems(libraryId, sort, sort.DefaultDescending(), page, limit);
+
+    public Task<LibraryItemsResponse> GetLibraryItems(string libraryId, LibrarySort sort, bool descending, int page = 0, int limit = 50) =>
+        _api.GetLibraryItems(libraryId, page, limit, sort.ApiField(), descending);
 
     /// <summary>Books by one author. The server's filter format is "authors.&lt;base64 of the author id&gt;".</summary>
     public async Task<List<LibraryItem>> GetBooks(string libraryId, Author author)
@@ -72,8 +75,9 @@ public sealed class AudiobookRepository
 
     public Task<SearchResponse> Search(string libraryId, string query) => _api.Search(libraryId, query);
 
-    public Task<SeriesListResponse> GetSeries(string libraryId, int page = 0, int limit = 50) =>
-        _api.GetSeries(libraryId, page, limit);
+    public Task<SeriesListResponse> GetSeries(string libraryId, int page = 0, int limit = 50,
+        SeriesSort sort = SeriesSort.Name, bool descending = false) =>
+        _api.GetSeries(libraryId, page, limit, sort.ApiField(), descending);
 
     public Task<LibraryItem> GetItem(string itemId) => _api.GetItem(itemId);
 

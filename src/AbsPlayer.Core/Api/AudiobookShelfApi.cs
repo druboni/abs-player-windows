@@ -199,9 +199,9 @@ public sealed class AudiobookShelfApi(UserPreferences preferences, HttpClient ht
         (await Perform<SearchResponse.Raw>(Request($"api/libraries/{libraryId}/search",
             query: [("q", query), ("limit", "25")])).ConfigureAwait(false)).ToResponse();
 
-    public Task<SeriesListResponse> GetSeries(string libraryId, int page, int limit) =>
+    public Task<SeriesListResponse> GetSeries(string libraryId, int page, int limit, string sort = "name", bool descending = false) =>
         Perform<SeriesListResponse>(Request($"api/libraries/{libraryId}/series",
-            query: [("limit", $"{limit}"), ("page", $"{page}"), ("sort", "name")]));
+            query: [("limit", $"{limit}"), ("page", $"{page}"), ("sort", sort), ("desc", descending ? "1" : "0")]));
 
     public Task<LibraryItem> GetItem(string itemId) =>
         Perform<LibraryItem>(Request($"api/items/{itemId}", query: [("expanded", "1")]));

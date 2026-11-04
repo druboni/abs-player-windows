@@ -56,7 +56,6 @@
 
             <TextBlock Text="Library" Style="{StaticResource SectionHeader}" />
             <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Spacing="12">
-                <ComboBox x:Name="Sort" Header="Sort by" MinWidth="200" SelectionChanged="OnSortChanged" />
                 <ToggleSwitch x:Name="HideFinished" Header="Hide finished books" Toggled="OnHideFinishedToggled" />
             </StackPanel>
 

@@ -126,7 +126,7 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs, Is
         _seriesLoading = true;
         try
         {
-            var r = await repository.GetSeries(lib.Id, _seriesPage, 50);
+            var r = await repository.GetSeries(lib.Id, _seriesPage, 50, prefs.SeriesSort, prefs.SeriesSortDescending);
             if (Selected != lib) return;
             foreach (var s in r.Results) Series.Add(s);
             _seriesTotal = r.Total;
@@ -173,7 +173,7 @@ public sealed class LibraryModel(AudiobookRepository repository, Prefs prefs, Is
         Notify(nameof(Loading));
         try
         {
-            var r = await repository.GetLibraryItems(lib.Id, prefs.LibrarySort, _page);
+            var r = await repository.GetLibraryItems(lib.Id, prefs.LibrarySort, prefs.LibrarySortDescending, _page);
             if (Selected == lib)
             {
                 foreach (var i in r.Results) Items.Add(i);
