@@ -198,14 +198,13 @@ public sealed partial class PlayerPage : Page
     private void OnPreviousChapter(object sender, RoutedEventArgs e) => Playback.PreviousChapter();
     private void OnNextChapter(object sender, RoutedEventArgs e) => Playback.NextChapter();
 
-    /// <summary>Space plays/pauses and the arrow keys skip, unless a text box or the slider has focus.</summary>
+    /// <summary>The arrow keys skip, unless a text box or the slider has focus. Space is handled app-wide by MainWindow.</summary>
     private void OnPageKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (FocusManager.GetFocusedElement(XamlRoot) is TextBox or Slider or PasswordBox) return;
         if (e.KeyStatus.IsMenuKeyDown) return;
         switch (e.Key)
         {
-            case VirtualKey.Space: Audio.Toggle(); break;
             case VirtualKey.Left: Audio.SkipBack(); break;
             case VirtualKey.Right: Audio.SkipForward(); break;
             default: return;

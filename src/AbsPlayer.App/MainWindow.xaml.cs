@@ -259,6 +259,22 @@ public sealed partial class MainWindow : Window
     private void OnCycleSpeed(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { Services.Audio.CycleSpeed(); e.Handled = true; }
     private void OnBack(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { GoBack(); e.Handled = true; }
 
+    /// <summary>
+    /// Space plays/pauses anywhere in the app while a book is loaded, unless you're typing. It's caught on the way
+    /// down, before a focused book tile or button turns it into a click. With nothing loaded, Space works as usual.
+    /// </summary>
+    private void OnRootPreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != Windows.System.VirtualKey.Space || !Services.Playback.IsActive) return;
+        if (e.KeyStatus.IsMenuKeyDown || IsDown(Windows.System.VirtualKey.Control) || IsDown(Windows.System.VirtualKey.Shift)) return;
+        if (FocusManager.GetFocusedElement(Root.XamlRoot) is TextBox or PasswordBox or RichEditBox) return;
+        e.Handled = true;
+        if (!e.KeyStatus.WasKeyDown) Services.Audio.Toggle(); // Holding Space doesn't flick it on and off.
+    }
+
+    private static bool IsDown(Windows.System.VirtualKey key) =>
+        Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(key).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+
     private void OnFocusSearch(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e)
     {
         if (TopBar.Visibility == Visibility.Visible) SearchBox.Focus(FocusState.Keyboard);

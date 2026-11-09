@@ -94,7 +94,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Ctrl+P (Space in the player)" FontWeight="SemiBold" />
+                <TextBlock Text="Space or Ctrl+P" FontWeight="SemiBold" />
                 <TextBlock Grid.Column="1" Text="Play / Pause" />
                 <TextBlock Grid.Row="1" Text="Ctrl+Left / Ctrl+Right" FontWeight="SemiBold" />
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="Skip back / forward" />
